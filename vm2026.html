@@ -1541,45 +1541,76 @@ function buildMobileBracket(rounds) {
   renderMobileRound(rounds[0], matchList);
 }
 
+function makeMatchCard(m) {
+  const s = SCH[m.num] || {};
+  const res = knockoutResults[m.num] || null;
+  const wd = getWeekday(s.date || '');
+  const dateStr = wd && s.date ? `${wd} ${s.date}` : (s.date || '');
+  const chClass = s.ch === 'SVT' ? 'm-ch-svt' : 'm-ch-tv4';
+  const isThird = m.num === THIRD;
+
+  function teamRow(t, side) {
+    const score = res ? (side === 'home' ? res.homeScore : res.awayScore) : null;
+    const isWinner = !!(res && res.winner === side);
+    const name = t ? t.name : 'TBD';
+    const flag = t ? F(t.name) : '–';
+    return `<div class="m-match-team${isWinner ? ' winner' : ''}">
+      <div class="m-team-left"><span class="m-team-flag">${flag}</span><span>${name}</span></div>
+      ${score !== null ? `<span class="m-score${isWinner ? ' winner' : ''}">${score}</span>` : ''}
+    </div>`;
+  }
+
+  const card = document.createElement('div');
+  card.className = 'm-match-card';
+  card.innerHTML = `
+    ${isThird ? `<div style="padding:6px 14px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);">3:e plats</div>` : ''}
+    ${teamRow(m.a, 'home')}
+    ${teamRow(m.b, 'away')}
+    <div class="m-match-meta">
+      ${s.ch ? `<span class="${chClass}">${s.ch}</span>` : ''}
+      ${dateStr ? `<span>${dateStr}</span>` : ''}
+      ${s.time ? `<span>${s.time}</span>` : ''}
+      ${s.venue ? `<span>${s.venue}</span>` : ''}
+    </div>`;
+  return card;
+}
+
+function getRoundName(n){
+  if(n>=89&&n<=96) return 'Omgång 16';
+  if(n>=97&&n<=100) return 'Kvartsfinalen';
+  if(n===101||n===102) return 'Semifinalen';
+  if(n===104) return 'Finalen';
+  return '';
+}
+
 function renderMobileRound(round, matchList) {
   matchList.innerHTML = '';
+
+  // Gruppera matcher i par baserat på next-värde
+  const pairMap = {};
+  const pairOrder = [];
   round.matches.forEach(m => {
-    const s = SCH[m.num] || {};
-    const res = knockoutResults[m.num] || null;
-    const wd = getWeekday(s.date || '');
-    const dateStr = wd && s.date ? `${wd} ${s.date}` : (s.date || '');
-    const chClass = s.ch === 'SVT' ? 'm-ch-svt' : 'm-ch-tv4';
+    const key = m.next != null ? String(m.next) : 'solo_' + m.num;
+    if (!pairMap[key]) { pairMap[key] = []; pairOrder.push(key); }
+    pairMap[key].push(m);
+  });
 
-    const isThird = m.num === THIRD;
-    const label = isThird ? '3:e plats' : '';
+  pairOrder.forEach(key => {
+    const pair = pairMap[key];
+    const hasPair = pair.length === 2;
+    const wrapper = document.createElement('div');
+    wrapper.className = hasPair ? 'm-pair' : '';
 
-    function teamRow(t, side) {
-      const score = res ? (side === 'home' ? res.homeScore : res.awayScore) : null;
-      const isWinner = !!(res && res.winner === side);
-      const name = t ? t.name : 'TBD';
-      const flag = t ? F(t.name) : '–';
-      return `<div class="m-match-team${isWinner ? ' winner' : ''}">
-        <div class="m-team-left">
-          <span class="m-team-flag">${flag}</span>
-          <span>${name}</span>
-        </div>
-        ${score !== null ? `<span class="m-score${isWinner ? ' winner' : ''}">${score}</span>` : ''}
-      </div>`;
+    pair.forEach(m => wrapper.appendChild(makeMatchCard(m)));
+
+    if (hasPair && pair[0].next) {
+      const conn = document.createElement('div');
+      conn.className = 'm-pair-connector';
+      conn.textContent = `Vinnarna möts i ${getRoundName(pair[0].next)}`;
+      wrapper.appendChild(conn);
     }
 
-    const card = document.createElement('div');
-    card.className = 'm-match-card';
-    card.innerHTML = `
-      ${label ? `<div style="padding:6px 14px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);">${label}</div>` : ''}
-      ${teamRow(m.a, 'home')}
-      ${teamRow(m.b, 'away')}
-      <div class="m-match-meta">
-        ${s.ch ? `<span class="${chClass}">${s.ch}</span>` : ''}
-        ${dateStr ? `<span>${dateStr}</span>` : ''}
-        ${s.time ? `<span>${s.time}</span>` : ''}
-        ${s.venue ? `<span>${s.venue}</span>` : ''}
-      </div>`;
-    matchList.appendChild(card);
+    matchList.appendChild(wrapper);
   });
 }
 
