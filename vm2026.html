@@ -1500,6 +1500,79 @@ function buildBracket() {
 }
 
 // ═══════════════════════════════════════
+// MOBIL SLUTSPELSVY
+// ═══════════════════════════════════════
+function buildMobileBracket(rounds) {
+  const container = document.getElementById('mobile-bracket');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // Rundflikar
+  const tabBar = document.createElement('div');
+  tabBar.className = 'm-round-tabs';
+  const matchList = document.createElement('div');
+  matchList.className = 'm-match-list';
+
+  rounds.forEach((round, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'm-round-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = round.name;
+    btn.onclick = () => {
+      tabBar.querySelectorAll('.m-round-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMobileRound(round, matchList);
+    };
+    tabBar.appendChild(btn);
+  });
+
+  container.appendChild(tabBar);
+  container.appendChild(matchList);
+  renderMobileRound(rounds[0], matchList);
+}
+
+function renderMobileRound(round, matchList) {
+  matchList.innerHTML = '';
+  round.matches.forEach(m => {
+    const s = SCH[m.num] || {};
+    const res = knockoutResults[m.num] || null;
+    const wd = getWeekday(s.date || '');
+    const dateStr = wd && s.date ? `${wd} ${s.date}` : (s.date || '');
+    const chClass = s.ch === 'SVT' ? 'm-ch-svt' : 'm-ch-tv4';
+
+    const isThird = m.num === THIRD;
+    const label = isThird ? '3:e plats' : '';
+
+    function teamRow(t, side) {
+      const score = res ? (side === 'home' ? res.homeScore : res.awayScore) : null;
+      const isWinner = !!(res && res.winner === side);
+      const name = t ? t.name : 'TBD';
+      const flag = t ? F(t.name) : '–';
+      return `<div class="m-match-team${isWinner ? ' winner' : ''}">
+        <div class="m-team-left">
+          <span class="m-team-flag">${flag}</span>
+          <span>${name}</span>
+        </div>
+        ${score !== null ? `<span class="m-score${isWinner ? ' winner' : ''}">${score}</span>` : ''}
+      </div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'm-match-card';
+    card.innerHTML = `
+      ${label ? `<div style="padding:6px 14px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);">${label}</div>` : ''}
+      ${teamRow(m.a, 'home')}
+      ${teamRow(m.b, 'away')}
+      <div class="m-match-meta">
+        ${s.ch ? `<span class="${chClass}">${s.ch}</span>` : ''}
+        ${dateStr ? `<span>${dateStr}</span>` : ''}
+        ${s.time ? `<span>${s.time}</span>` : ''}
+        ${s.venue ? `<span>${s.venue}</span>` : ''}
+      </div>`;
+    matchList.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════
 // RENDER GRUPPER
 // ═══════════════════════════════════════
 function renderGroups(){
