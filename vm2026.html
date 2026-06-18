@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<!-- saved from url=(0042)file:///Users/isak/Downloads/vm2026_4.html -->
+<html lang="sv"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VM 2026 — Grupper &amp; Slutspelsträd</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap');
+  :root {
+    --pitch:#0a2a1a; --pitch-mid:#0f3522;
+    --gold:#c9a227; --gold-light:#e8c050;
+    --white:#f5f5f0; --muted:#8a9a8e;
+    --card:#0d2e1c; --card-border:#1e4a2d;
+    --qual1:#1a6b3a; --qual2:#1a4a6b; --qual3:#5a4a1a;
+    --gap:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--pitch);color:var(--white);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh;}
+
+  header{background:linear-gradient(135deg,#041810 0%,var(--pitch-mid) 100%);border-bottom:2px solid var(--gold);padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .logo-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--gold);line-height:1;}
+  .logo-sub{font-size:11px;font-weight:600;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
+  .header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .last-update{font-size:11px;color:var(--muted);letter-spacing:.5px;}
+  #refresh-btn{background:var(--gold);color:#000;border:none;border-radius:6px;padding:8px 16px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+  #refresh-btn:hover{background:var(--gold-light);}
+  #refresh-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  .tabs{display:flex;border-bottom:1px solid var(--card-border);padding:0 24px;background:var(--pitch-mid);}
+  .tab-btn{background:none;border:none;color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:14px 20px;cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-color .2s;margin-bottom:-1px;}
+  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+  .tab-btn:hover:not(.active){color:var(--white);}
+
+  main{padding:24px;max-width:1800px;margin:0 auto;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  .status-bar{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
+  .spinner{width:16px;height:16px;border:2px solid var(--card-border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .status-bar.hidden{display:none;}
+  .error-box{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);border-radius:8px;padding:14px 16px;color:#fa8a7a;font-size:13px;margin-bottom:16px;}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;font-size:11px;color:var(--muted);}
+  .legend-item{display:flex;align-items:center;gap:6px;}
+  .legend-dot{width:10px;height:10px;border-radius:2px;}
+  .l-auto{background:var(--qual1);} .l-best3{background:var(--qual3);} .l-out{background:rgba(255,255,255,.05);}
+
+  .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:var(--gap);}
+  .group-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;overflow:hidden;}
+  .group-header{background:var(--pitch-mid);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--card-border);}
+  .group-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--gold);}
+  .group-played{font-size:10px;color:var(--muted);}
+  .standings-table{width:100%;border-collapse:collapse;}
+  .standings-table thead th{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 8px 6px;text-align:center;}
+  .standings-table thead th:first-child{text-align:left;padding-left:14px;}
+  .standings-table tbody tr{border-top:1px solid rgba(255,255,255,.04);}
+  .standings-table tbody tr:hover{background:rgba(255,255,255,.03);}
+  .standings-table tbody td{padding:9px 8px;text-align:center;font-size:13px;}
+  .standings-table tbody td:first-child{text-align:left;padding-left:14px;padding-right:4px;}
+  .pos-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0;}
+  .pos-1{background:var(--qual1);color:#6efa9a;}
+  .pos-2{background:var(--qual2);color:#6ec0fa;}
+  .pos-3{background:var(--qual3);color:#fad96e;}
+  .pos-4{background:rgba(255,255,255,.05);color:var(--muted);}
+  .team-cell{display:flex;align-items:center;}
+  .flag{font-size:18px;margin-right:8px;line-height:1;}
+  .pts-cell{font-weight:700;font-size:14px;}
+  .gd-pos{color:#6efa9a;} .gd-neg{color:#fa6e6e;} .gd-zero{color:var(--muted);}
+
+  /* ══════ BRACKET ══════ */
+  .bracket-scroll{overflow-x:auto;overflow-y:auto;padding:8px 0 20px;}
+
+  /* The bracket is drawn on a canvas-like SVG — we overlay HTML match cards using absolute positioning */
+  .bracket-stage{
+    position:relative;
+    /* width & height set by JS */
+  }
+
+  /* Round column headers */
+  .b-round-headers{
+    display:flex;
+    position:absolute;
+    top:0; left:0; right:0;
+  }
+  .b-round-hdr{
+    font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+    color:var(--gold);text-align:center;flex-shrink:0;
+  }
+
+  /* Match card */
+  .b-card{
+    position:absolute;
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:6px;
+    overflow:hidden;
+    transition:border-color .2s;
+  }
+  .b-card:hover{border-color:var(--gold);}
+  .b-card.final-card{border-color:var(--gold);box-shadow:0 0 16px rgba(201,162,39,.3);}
+
+  .b-team{
+    display:flex;align-items:center;gap:4px;
+    padding:4px 7px;font-size:10px;font-weight:500;
+    min-height:24px;line-height:1.2;
+  }
+  .b-team:first-child{border-bottom:1px solid var(--card-border);}
+  .b-team.tbd{color:var(--muted);font-style:italic;}
+  .b-eflag{font-size:12px;flex-shrink:0;}
+  .b-ename{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .b-meta{
+    background:rgba(0,0,0,.25);border-top:1px solid var(--card-border);
+    padding:2px 7px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .b-time{font-size:8px;color:var(--gold);font-weight:600;}
+  .b-venue{font-size:7px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;}
+  .b-num{display:none;}
+
+  /* Final trophy zone */
+  .b-trophy{
+    position:absolute;
+    display:flex;flex-direction:column;align-items:center;
+    font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    color:var(--gold-light);
+  }
+  .b-trophy span{font-size:22px;margin-bottom:3px;}
+
+  /* Connector SVG sits behind cards */
+  .b-svg{position:absolute;top:0;left:0;pointer-events:none;}
+
+  @media(max-width:600px){header{padding:14px 16px;}main{padding:14px 8px;}.groups-grid{grid-template-columns:1fr;}.logo-title{font-size:24px;}}
+
+  /* ══════ CHANNEL BADGE ══════ */
+  .b-ch{font-size:7px;font-weight:800;letter-spacing:.5px;padding:1px 4px;border-radius:3px;flex-shrink:0;text-transform:uppercase;}
+  .ch-tv4{background:#0066CC;color:#fff;}
+  .ch-svt{background:#006633;color:#9effc0;}
+  .b-date{font-size:7px;color:var(--white);padding:0 3px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* Score display */
+  .b-score{margin-left:auto;font-size:13px;font-weight:700;min-width:16px;text-align:right;flex-shrink:0;padding-right:2px;line-height:1.2;}
+  .b-team.winner .b-ename{font-weight:700;}
+  .b-team.winner .b-score{color:var(--gold);}
+  .b-team:not(.winner):not(.tbd) .b-score{color:var(--muted);}
+  /* Override meta */
+  .b-meta{background:rgba(0,0,0,.25);border-top:1px solid var(--card-border);padding:3px 7px;display:flex;align-items:center;gap:3px;flex-wrap:wrap;}
+  /* Zoom controls */
+  .zoom-bar{display:flex;align-items:center;gap:8px;padding:4px 0 12px;}
+  .zoom-btn{background:var(--card);border:1px solid var(--card-border);color:var(--white);width:30px;height:30px;border-radius:6px;font-size:18px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;line-height:1;}
+  .zoom-btn:hover{background:var(--pitch-mid);}
+  .zoom-label{font-size:12px;color:var(--muted);min-width:42px;text-align:center;}
+  .zoom-fit{font-size:10px!important;width:auto!important;padding:0 10px!important;letter-spacing:.5px;}
+  .bracket-outer{overflow:auto;width:100%;}
+  .bracket-scroll{padding:8px 0 20px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo-title">VM 2026</div>
+    <div class="logo-sub">Grupper &amp; Slutspelsträd</div>
+  </div>
+  <div class="header-right">
+    <span class="last-update" id="last-update">Ej uppdaterad ännu</span>
+    <button id="refresh-btn" onclick="manualRefresh()">↻ Uppdatera nu</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(&#39;groups&#39;,this)">Gruppspel</button>
+  <button class="tab-btn" onclick="switchTab(&#39;bracket&#39;,this)">Slutspelsträd</button>
+</div>
+
+<main>
+  <div id="status" class="status-bar hidden">
+    <div class="spinner"></div>
+    <span id="status-text">Hämtar resultat från football-data.org…</span>
+  </div>
+  <div id="error-area"><div class="error-box">⚠️ Kunde inte nå API:et. Kör <code>python3 server.py</code> och öppna <a href="http://localhost:8765/" style="color:var(--gold)">http://localhost:8765</a>.</div></div>
+
+  <div id="tab-groups" class="tab-panel active">
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot l-auto"></span>Vidare (1:a / 2:a)</span>
+      <span class="legend-item"><span class="legend-dot l-best3"></span>Bästa 3:a just nu</span>
+      <span class="legend-item"><span class="legend-dot l-out"></span>Ej vidare</span>
+    </div>
+    <div class="groups-grid" id="groups-container"><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp A</span>
+        <span class="group-played">2 matcher spelade</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇲🇽</span>
+            <span class="team-name">Mexico</span>
+          </div></td>
+          <td>1</td><td>1</td><td>0</td><td>0</td>
+          <td class="gd-pos">+2</td>
+          <td class="pts-cell">3</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇰🇷</span>
+            <span class="team-name">South Korea</span>
+          </div></td>
+          <td>1</td><td>1</td><td>0</td><td>0</td>
+          <td class="gd-pos">+1</td>
+          <td class="pts-cell">3</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇨🇿</span>
+            <span class="team-name">Czechia</span>
+          </div></td>
+          <td>1</td><td>0</td><td>0</td><td>1</td>
+          <td class="gd-neg">-1</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇿🇦</span>
+            <span class="team-name">South Africa</span>
+          </div></td>
+          <td>1</td><td>0</td><td>0</td><td>1</td>
+          <td class="gd-neg">-2</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp B</span>
+        <span class="group-played">2 matcher spelade</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇨🇭</span>
+            <span class="team-name">Switzerland</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇨🇦</span>
+            <span class="team-name">Canada</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇶🇦</span>
+            <span class="team-name">Qatar</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇧🇦</span>
+            <span class="team-name">Bosnia</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp C</span>
+        <span class="group-played">2 matcher spelade</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🏴󠁧󠁢󠁳󠁣󠁴󠁿</span>
+            <span class="team-name">Scotland</span>
+          </div></td>
+          <td>1</td><td>1</td><td>0</td><td>0</td>
+          <td class="gd-pos">+1</td>
+          <td class="pts-cell">3</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇧🇷</span>
+            <span class="team-name">Brazil</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇲🇦</span>
+            <span class="team-name">Morocco</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇭🇹</span>
+            <span class="team-name">Haiti</span>
+          </div></td>
+          <td>1</td><td>0</td><td>0</td><td>1</td>
+          <td class="gd-neg">-1</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp D</span>
+        <span class="group-played">2 matcher spelade</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇺🇸</span>
+            <span class="team-name">USA</span>
+          </div></td>
+          <td>1</td><td>1</td><td>0</td><td>0</td>
+          <td class="gd-pos">+3</td>
+          <td class="pts-cell">3</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇦🇺</span>
+            <span class="team-name">Australia</span>
+          </div></td>
+          <td>1</td><td>1</td><td>0</td><td>0</td>
+          <td class="gd-pos">+2</td>
+          <td class="pts-cell">3</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇹🇷</span>
+            <span class="team-name">Turkiye</span>
+          </div></td>
+          <td>1</td><td>0</td><td>0</td><td>1</td>
+          <td class="gd-neg">-2</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇵🇾</span>
+            <span class="team-name">Paraguay</span>
+          </div></td>
+          <td>1</td><td>0</td><td>0</td><td>1</td>
+          <td class="gd-neg">-3</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp E</span>
+        <span class="group-played">2 matcher spelade</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇩🇪</span>
+            <span class="team-name">Germany</span>
+          </div></td>
+          <td>1</td><td>1</td><td>0</td><td>0</td>
+          <td class="gd-pos">+6</td>
+          <td class="pts-cell">3</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇨🇮</span>
+            <span class="team-name">Ivory Coast</span>
+          </div></td>
+          <td>1</td><td>1</td><td>0</td><td>0</td>
+          <td class="gd-pos">+1</td>
+          <td class="pts-cell">3</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇪🇨</span>
+            <span class="team-name">Ecuador</span>
+          </div></td>
+          <td>1</td><td>0</td><td>0</td><td>1</td>
+          <td class="gd-neg">-1</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇨🇼</span>
+            <span class="team-name">Curacao</span>
+          </div></td>
+          <td>1</td><td>0</td><td>0</td><td>1</td>
+          <td class="gd-neg">-6</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp F</span>
+        <span class="group-played">2 matcher spelade</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇸🇪</span>
+            <span class="team-name">Sweden</span>
+          </div></td>
+          <td>1</td><td>1</td><td>0</td><td>0</td>
+          <td class="gd-pos">+4</td>
+          <td class="pts-cell">3</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇳🇱</span>
+            <span class="team-name">Netherlands</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇯🇵</span>
+            <span class="team-name">Japan</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇹🇳</span>
+            <span class="team-name">Tunisia</span>
+          </div></td>
+          <td>1</td><td>0</td><td>0</td><td>1</td>
+          <td class="gd-neg">-4</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp G</span>
+        <span class="group-played">2 matcher spelade</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇮🇷</span>
+            <span class="team-name">Iran</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇳🇿</span>
+            <span class="team-name">New Zealand</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇧🇪</span>
+            <span class="team-name">Belgium</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇪🇬</span>
+            <span class="team-name">Egypt</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp H</span>
+        <span class="group-played">2 matcher spelade</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇸🇦</span>
+            <span class="team-name">Saudi Arabia</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇺🇾</span>
+            <span class="team-name">Uruguay</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇪🇸</span>
+            <span class="team-name">Spain</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇨🇻</span>
+            <span class="team-name">Cape Verde</span>
+          </div></td>
+          <td>1</td><td>0</td><td>1</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">1</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp I</span>
+        <span class="group-played">Ej spelat</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇫🇷</span>
+            <span class="team-name">France</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇸🇳</span>
+            <span class="team-name">Senegal</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇮🇶</span>
+            <span class="team-name">Iraq</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇳🇴</span>
+            <span class="team-name">Norway</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp J</span>
+        <span class="group-played">Ej spelat</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇦🇷</span>
+            <span class="team-name">Argentina</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇩🇿</span>
+            <span class="team-name">Algeria</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇦🇹</span>
+            <span class="team-name">Austria</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇯🇴</span>
+            <span class="team-name">Jordan</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp K</span>
+        <span class="group-played">Ej spelat</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🇵🇹</span>
+            <span class="team-name">Portugal</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇨🇩</span>
+            <span class="team-name">DR Congo</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇺🇿</span>
+            <span class="team-name">Uzbekistan</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇨🇴</span>
+            <span class="team-name">Colombia</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div><div class="group-card">
+      <div class="group-header">
+        <span class="group-name">Grupp L</span>
+        <span class="group-played">Ej spelat</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-1">1</span>
+            <span class="flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+            <span class="team-name">England</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-2">2</span>
+            <span class="flag">🇭🇷</span>
+            <span class="team-name">Croatia</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-3">3</span>
+            <span class="flag">🇬🇭</span>
+            <span class="team-name">Ghana</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr><tr>
+          <td><div class="team-cell">
+            <span class="pos-badge pos-4">4</span>
+            <span class="flag">🇵🇦</span>
+            <span class="team-name">Panama</span>
+          </div></td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="gd-zero">0</td>
+          <td class="pts-cell">0</td>
+        </tr></tbody>
+      </table></div></div>
+  </div>
+
+  <div id="tab-bracket" class="tab-panel">
+    <div class="zoom-bar">
+      <button class="zoom-btn" onclick="zoomBracket(-0.15)">−</button>
+      <span class="zoom-label" id="zoom-label">100%</span>
+      <button class="zoom-btn" onclick="zoomBracket(0.15)">+</button>
+      <button class="zoom-btn zoom-fit" onclick="fitBracket()">↔ Anpassa</button>
+    </div>
+    <div class="bracket-outer" id="bracket-outer">
+    <div class="bracket-scroll" id="bracket-scroll">
+      <div class="bracket-stage" id="bracket-stage" style="width: 1723px; height: 678px;"><svg width="1723" height="678" class="b-svg"><polyline points="155,60.400000000000006 173,60.400000000000006" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="155,134.4 173,134.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="173,60.400000000000006 173,134.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="173,104 191,104" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="155,208.4 173,208.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="155,282.4 173,282.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="173,208.4 173,282.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="173,252 191,252" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="155,356.4 173,356.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="155,430.4 173,430.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="173,356.4 173,430.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="173,400 191,400" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="155,504.4 173,504.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="155,578.4 173,578.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="173,504.4 173,578.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="173,548 191,548" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="346,97.4 364,97.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="346,245.4 364,245.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="364,97.4 364,245.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="364,178 382,178" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="346,393.4 364,393.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="346,541.4 364,541.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="364,393.4 364,541.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="364,474 382,474" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="537,171.4 555,171.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="537,467.4 555,467.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="555,171.4 555,467.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="555,319.4 573,319.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1568,60.400000000000006 1550,60.400000000000006" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1568,134.4 1550,134.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,60.400000000000006 1550,134.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,104 1532,104" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1568,208.4 1550,208.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1568,282.4 1550,282.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,208.4 1550,282.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,252 1532,252" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1568,356.4 1550,356.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1568,430.4 1550,430.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,356.4 1550,430.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,400 1532,400" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1568,504.4 1550,504.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1568,578.4 1550,578.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,504.4 1550,578.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,548 1532,548" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1532,97.4 1550,97.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1532,245.4 1550,245.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,97.4 1550,245.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,178 1341,178" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1532,393.4 1550,393.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1532,541.4 1550,541.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,393.4 1550,541.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1550,474 1341,474" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1341,171.4 1359,171.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1341,467.4 1359,467.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1359,171.4 1359,467.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="1359,319.4 1150,319.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="728,319.4 784,319.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline><polyline points="995,319.4 939,319.4" stroke="#1e4a2d" stroke-width="1.5" fill="none"></polyline></svg><div class="b-round-hdr" style="position: absolute; top: 0px; left: 0px; width: 155px;">Omg. 32</div><div class="b-round-hdr" style="position: absolute; top: 0px; left: 191px; width: 155px;">Omg. 16</div><div class="b-round-hdr" style="position: absolute; top: 0px; left: 382px; width: 155px;">Kvarts</div><div class="b-round-hdr" style="position: absolute; top: 0px; left: 573px; width: 155px;">Semifinal</div><div class="b-round-hdr" style="position: absolute; top: 0px; left: 959px; width: 155px;">Omg. 32</div><div class="b-round-hdr" style="position: absolute; top: 0px; left: 1150px; width: 155px;">Omg. 16</div><div class="b-round-hdr" style="position: absolute; top: 0px; left: 1341px; width: 155px;">Kvarts</div><div class="b-round-hdr" style="position: absolute; top: 0px; left: 1532px; width: 155px;">Semifinal</div><div class="b-round-hdr" style="position: absolute; top: 0px; left: 764px; width: 195px; text-align: center; color: var(--gold-light);">FINAL</div><div class="b-card" style="left: 0px; top: 34px; width: 155px;"><div class="b-team"><span class="b-eflag">🇰🇷</span><span class="b-ename">South Korea</span></div><div class="b-team"><span class="b-eflag">🇨🇦</span><span class="b-ename">Canada</span></div>
+      <div class="b-meta">
+        <span class="b-time">21:00 🇸🇪</span>
+        <span class="b-venue">Los Angeles</span>
+        <span class="b-num">#73</span>
+      </div></div><div class="b-card" style="left: 0px; top: 108px; width: 155px;"><div class="b-team"><span class="b-eflag">🏴󠁧󠁢󠁳󠁣󠁴󠁿</span><span class="b-ename">Scotland</span></div><div class="b-team"><span class="b-eflag">🇳🇱</span><span class="b-ename">Netherlands</span></div>
+      <div class="b-meta">
+        <span class="b-time">19:00 🇸🇪</span>
+        <span class="b-venue">Houston</span>
+        <span class="b-num">#76</span>
+      </div></div><div class="b-card" style="left: 0px; top: 182px; width: 155px;"><div class="b-team"><span class="b-eflag">🇲🇽</span><span class="b-ename">Mexico</span></div><div class="b-team"><span class="b-eflag">🇲🇦</span><span class="b-ename">Morocco</span></div>
+      <div class="b-meta">
+        <span class="b-time">03:00 🇸🇪</span>
+        <span class="b-venue">Mexiko City</span>
+        <span class="b-num">#79</span>
+      </div></div><div class="b-card" style="left: 0px; top: 256px; width: 155px;"><div class="b-team"><span class="b-eflag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class="b-ename">England</span></div><div class="b-team"><span class="b-eflag">🇧🇪</span><span class="b-ename">Belgium</span></div>
+      <div class="b-meta">
+        <span class="b-time">18:00 🇸🇪</span>
+        <span class="b-venue">Atlanta</span>
+        <span class="b-num">#80</span>
+      </div></div><div class="b-card" style="left: 0px; top: 330px; width: 155px;"><div class="b-team"><span class="b-eflag">🇺🇸</span><span class="b-ename">USA</span></div><div class="b-team"><span class="b-eflag">🇪🇸</span><span class="b-ename">Spain</span></div>
+      <div class="b-meta">
+        <span class="b-time">02:00 🇸🇪</span>
+        <span class="b-venue">Santa Clara</span>
+        <span class="b-num">#81</span>
+      </div></div><div class="b-card" style="left: 0px; top: 404px; width: 155px;"><div class="b-team"><span class="b-eflag">🇮🇷</span><span class="b-ename">Iran</span></div><div class="b-team"><span class="b-eflag">🇮🇶</span><span class="b-ename">Iraq</span></div>
+      <div class="b-meta">
+        <span class="b-time">22:00 🇸🇪</span>
+        <span class="b-venue">Seattle</span>
+        <span class="b-num">#82</span>
+      </div></div><div class="b-card" style="left: 0px; top: 478px; width: 155px;"><div class="b-team"><span class="b-eflag">🇩🇪</span><span class="b-ename">Germany</span></div><div class="b-team"><span class="b-eflag">🇯🇵</span><span class="b-ename">Japan</span></div>
+      <div class="b-meta">
+        <span class="b-time">22:30 🇸🇪</span>
+        <span class="b-venue">Foxborough</span>
+        <span class="b-num">#74</span>
+      </div></div><div class="b-card" style="left: 0px; top: 552px; width: 155px;"><div class="b-team"><span class="b-eflag">🇸🇪</span><span class="b-ename">Sweden</span></div><div class="b-team"><span class="b-eflag">🇧🇷</span><span class="b-ename">Brazil</span></div>
+      <div class="b-meta">
+        <span class="b-time">03:00 🇸🇪</span>
+        <span class="b-venue">Guadalajara</span>
+        <span class="b-num">#75</span>
+      </div></div><div class="b-card" style="left: 191px; top: 71px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">23:00 🇸🇪</span>
+        <span class="b-venue">Philadelphia</span>
+        <span class="b-num">#89</span>
+      </div></div><div class="b-card" style="left: 191px; top: 219px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">19:00 🇸🇪</span>
+        <span class="b-venue">Houston</span>
+        <span class="b-num">#90</span>
+      </div></div><div class="b-card" style="left: 191px; top: 367px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">22:00 🇸🇪</span>
+        <span class="b-venue">New Jersey</span>
+        <span class="b-num">#91</span>
+      </div></div><div class="b-card" style="left: 191px; top: 515px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">02:00 🇸🇪</span>
+        <span class="b-venue">Mexiko City</span>
+        <span class="b-num">#92</span>
+      </div></div><div class="b-card" style="left: 382px; top: 145px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">22:00 🇸🇪</span>
+        <span class="b-venue">Foxborough</span>
+        <span class="b-num">#97</span>
+      </div></div><div class="b-card" style="left: 382px; top: 441px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">21:00 🇸🇪</span>
+        <span class="b-venue">Los Angeles</span>
+        <span class="b-num">#98</span>
+      </div></div><div class="b-card" style="left: 573px; top: 293px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">21:00 🇸🇪</span>
+        <span class="b-venue">Arlington</span>
+        <span class="b-num">#101</span>
+      </div></div><div class="b-card" style="left: 1568px; top: 34px; width: 155px;"><div class="b-team"><span class="b-eflag">🇫🇷</span><span class="b-ename">France</span></div><div class="b-team"><span class="b-eflag">🇶🇦</span><span class="b-ename">Qatar</span></div>
+      <div class="b-meta">
+        <span class="b-time">23:00 🇸🇪</span>
+        <span class="b-venue">New Jersey</span>
+        <span class="b-num">#77</span>
+      </div></div><div class="b-card" style="left: 1568px; top: 108px; width: 155px;"><div class="b-team"><span class="b-eflag">🇨🇮</span><span class="b-ename">Ivory Coast</span></div><div class="b-team"><span class="b-eflag">🇸🇳</span><span class="b-ename">Senegal</span></div>
+      <div class="b-meta">
+        <span class="b-time">19:00 🇸🇪</span>
+        <span class="b-venue">Arlington</span>
+        <span class="b-num">#78</span>
+      </div></div><div class="b-card" style="left: 1568px; top: 182px; width: 155px;"><div class="b-team"><span class="b-eflag">🇨🇩</span><span class="b-ename">DR Congo</span></div><div class="b-team"><span class="b-eflag">🇭🇷</span><span class="b-ename">Croatia</span></div>
+      <div class="b-meta">
+        <span class="b-time">01:00 🇸🇪</span>
+        <span class="b-venue">Toronto</span>
+        <span class="b-num">#83</span>
+      </div></div><div class="b-card" style="left: 1568px; top: 256px; width: 155px;"><div class="b-team"><span class="b-eflag">🇸🇦</span><span class="b-ename">Saudi Arabia</span></div><div class="b-team"><span class="b-eflag">🇩🇿</span><span class="b-ename">Algeria</span></div>
+      <div class="b-meta">
+        <span class="b-time">21:00 🇸🇪</span>
+        <span class="b-venue">Los Angeles</span>
+        <span class="b-num">#84</span>
+      </div></div><div class="b-card" style="left: 1568px; top: 330px; width: 155px;"><div class="b-team"><span class="b-eflag">🇨🇭</span><span class="b-ename">Switzerland</span></div><div class="b-team"><span class="b-eflag">🇦🇹</span><span class="b-ename">Austria</span></div>
+      <div class="b-meta">
+        <span class="b-time">05:00 🇸🇪</span>
+        <span class="b-venue">Vancouver</span>
+        <span class="b-num">#85</span>
+      </div></div><div class="b-card" style="left: 1568px; top: 404px; width: 155px;"><div class="b-team"><span class="b-eflag">🇦🇷</span><span class="b-ename">Argentina</span></div><div class="b-team"><span class="b-eflag">🇺🇾</span><span class="b-ename">Uruguay</span></div>
+      <div class="b-meta">
+        <span class="b-time">00:00 🇸🇪</span>
+        <span class="b-venue">Miami</span>
+        <span class="b-num">#86</span>
+      </div></div><div class="b-card" style="left: 1568px; top: 478px; width: 155px;"><div class="b-team"><span class="b-eflag">🇵🇹</span><span class="b-ename">Portugal</span></div><div class="b-team"><span class="b-eflag">🇺🇿</span><span class="b-ename">Uzbekistan</span></div>
+      <div class="b-meta">
+        <span class="b-time">03:30 🇸🇪</span>
+        <span class="b-venue">Kansas City</span>
+        <span class="b-num">#87</span>
+      </div></div><div class="b-card" style="left: 1568px; top: 552px; width: 155px;"><div class="b-team"><span class="b-eflag">🇦🇺</span><span class="b-ename">Australia</span></div><div class="b-team"><span class="b-eflag">🇳🇿</span><span class="b-ename">New Zealand</span></div>
+      <div class="b-meta">
+        <span class="b-time">20:00 🇸🇪</span>
+        <span class="b-venue">Arlington</span>
+        <span class="b-num">#88</span>
+      </div></div><div class="b-card" style="left: 1377px; top: 71px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">21:00 🇸🇪</span>
+        <span class="b-venue">Arlington</span>
+        <span class="b-num">#93</span>
+      </div></div><div class="b-card" style="left: 1377px; top: 219px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">02:00 🇸🇪</span>
+        <span class="b-venue">Seattle</span>
+        <span class="b-num">#94</span>
+      </div></div><div class="b-card" style="left: 1377px; top: 367px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">18:00 🇸🇪</span>
+        <span class="b-venue">Atlanta</span>
+        <span class="b-num">#95</span>
+      </div></div><div class="b-card" style="left: 1377px; top: 515px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">22:00 🇸🇪</span>
+        <span class="b-venue">Vancouver</span>
+        <span class="b-num">#96</span>
+      </div></div><div class="b-card" style="left: 1186px; top: 145px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">23:00 🇸🇪</span>
+        <span class="b-venue">Miami</span>
+        <span class="b-num">#99</span>
+      </div></div><div class="b-card" style="left: 1186px; top: 441px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">03:00 🇸🇪</span>
+        <span class="b-venue">Kansas City</span>
+        <span class="b-num">#100</span>
+      </div></div><div class="b-card" style="left: 995px; top: 293px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">21:00 🇸🇪</span>
+        <span class="b-venue">Atlanta</span>
+        <span class="b-num">#102</span>
+      </div></div><div class="b-card final-card" style="left: 784px; top: 293px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">21:00 🇸🇪</span>
+        <span class="b-venue">New Jersey</span>
+        <span class="b-num">#104</span>
+      </div></div><div class="b-trophy" style="left: 784px; top: 30px; width: 155px;"><span>🏆</span></div><div class="b-card" style="left: 784px; top: 628px; width: 155px;"><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div><div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span></div>
+      <div class="b-meta">
+        <span class="b-time">23:00 🇸🇪</span>
+        <span class="b-venue">Miami</span>
+        <span class="b-num">#103</span>
+      </div></div><div style="position: absolute; left: 784px; top: 614px; width: 155px; text-align: center; font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted);">3:e plats · 18 jul</div></div>
+    </div>
+    </div><!-- bracket-outer -->
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════
+// API
+// ═══════════════════════════════════════
+const PROXY = window.location.port === '8765'
+  ? 'http://localhost:8765/api'
+  : 'https://api.football-data.org/v4';
+const API_TOKEN = '634a7a50cdbd4cba8205ca185ab8c78d';
+// NOTE: Direct browser requests to football-data.org are blocked by CORS.
+// Run server.py and open http://localhost:8765 for live data.
+
+async function apiFetch(path) {
+  const isProxy = PROXY.includes('localhost');
+  const resp = await fetch(PROXY + path, {
+    headers: isProxy ? {} : { 'X-Auth-Token': API_TOKEN }
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return resp.json();
+}
+
+// ═══════════════════════════════════════
+// FLAGS
+// ═══════════════════════════════════════
+const FLAGS = {
+  'Mexico':'🇲🇽','South Korea':'🇰🇷','Korea Republic':'🇰🇷','Czechia':'🇨🇿',
+  'Czech Republic':'🇨🇿','South Africa':'🇿🇦','Switzerland':'🇨🇭','Canada':'🇨🇦',
+  'Qatar':'🇶🇦','Bosnia and Herzegovina':'🇧🇦','Bosnia':'🇧🇦',
+  'Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Brazil':'🇧🇷','Morocco':'🇲🇦','Haiti':'🇭🇹',
+  'United States':'🇺🇸','USA':'🇺🇸','Australia':'🇦🇺',
+  'Türkiye':'🇹🇷','Turkey':'🇹🇷','Turkiye':'🇹🇷','Paraguay':'🇵🇾',
+  'Germany':'🇩🇪',"Côte d'Ivoire":'🇨🇮','Ivory Coast':'🇨🇮',
+  'Ecuador':'🇪🇨','Curaçao':'🇨🇼','Curacao':'🇨🇼',
+  'Sweden':'🇸🇪','Japan':'🇯🇵','Netherlands':'🇳🇱','Tunisia':'🇹🇳',
+  'Belgium':'🇧🇪','Egypt':'🇪🇬','Iran':'🇮🇷','New Zealand':'🇳🇿',
+  'Spain':'🇪🇸','Cabo Verde':'🇨🇻','Cape Verde':'🇨🇻',
+  'Saudi Arabia':'🇸🇦','Uruguay':'🇺🇾','France':'🇫🇷','Senegal':'🇸🇳',
+  'Iraq':'🇮🇶','Norway':'🇳🇴','Argentina':'🇦🇷','Algeria':'🇩🇿',
+  'Austria':'🇦🇹','Jordan':'🇯🇴','Portugal':'🇵🇹','DR Congo':'🇨🇩',
+  'Democratic Republic of Congo':'🇨🇩','Uzbekistan':'🇺🇿','Colombia':'🇨🇴',
+  'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croatia':'🇭🇷','Ghana':'🇬🇭','Panama':'🇵🇦'
+};
+const F = n => FLAGS[n] || '🏳️';
+
+// ═══════════════════════════════════════
+// WEEKDAY HELPER
+// ═══════════════════════════════════════
+const WEEKDAYS = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
+const MONTHS_PARSE = {jan:0,feb:1,mar:2,apr:3,maj:4,jun:5,jul:6,aug:7,sep:8,okt:9,nov:10,dec:11};
+function getWeekday(dateStr) {
+  if (!dateStr) return '';
+  const p = dateStr.trim().split(' ');
+  if (p.length < 2) return '';
+  const d = parseInt(p[0]), m = MONTHS_PARSE[p[1]];
+  if (isNaN(d) || m === undefined) return '';
+  return WEEKDAYS[new Date(2026, m, d).getDay()] || '';
+}
+
+// ═══════════════════════════════════════
+// SCHEDULE (CEST = svensk sommartid)
+// ch = SVT eller TV4 per publicerat sändningsschema
+// ═══════════════════════════════════════
+const SCH = {
+   73:{date:'28 jun',time:'21:00',venue:'Los Angeles',  ch:'TV4'},
+   74:{date:'29 jun',time:'22:30',venue:'Foxborough',   ch:'SVT'},
+   75:{date:'30 jun',time:'03:00',venue:'Guadalajara',  ch:'SVT'},
+   76:{date:'29 jun',time:'19:00',venue:'Houston',      ch:'TV4'},
+   77:{date:'30 jun',time:'23:00',venue:'New Jersey',   ch:'TV4'},
+   78:{date:'30 jun',time:'19:00',venue:'Arlington',    ch:'TV4'},
+   79:{date:'1 jul', time:'03:00',venue:'Mexico City',  ch:'TV4'},
+   80:{date:'1 jul', time:'18:00',venue:'Atlanta',      ch:'SVT'},
+   81:{date:'2 jul', time:'02:00',venue:'Santa Clara',  ch:'TV4'},
+   82:{date:'1 jul', time:'22:00',venue:'Seattle',      ch:'TV4'},
+   83:{date:'3 jul', time:'01:00',venue:'Toronto',      ch:'TV4'},
+   84:{date:'2 jul', time:'21:00',venue:'Los Angeles',  ch:'SVT'},
+   85:{date:'3 jul', time:'05:00',venue:'Vancouver',    ch:'TV4'},
+   86:{date:'4 jul', time:'00:00',venue:'Miami',        ch:'SVT'},
+   87:{date:'4 jul', time:'03:30',venue:'Kansas City',  ch:'SVT'},
+   88:{date:'3 jul', time:'20:00',venue:'Arlington',    ch:'TV4'},
+   89:{date:'4 jul', time:'23:00',venue:'Philadelphia', ch:'SVT'},
+   90:{date:'4 jul', time:'19:00',venue:'Houston',      ch:'TV4'},
+   91:{date:'5 jul', time:'22:00',venue:'New Jersey',   ch:'TV4'},
+   92:{date:'6 jul', time:'02:00',venue:'Mexico City',  ch:'SVT'},
+   93:{date:'6 jul', time:'21:00',venue:'Arlington',    ch:'TV4'},
+   94:{date:'7 jul', time:'02:00',venue:'Seattle',      ch:'TV4'},
+   95:{date:'7 jul', time:'18:00',venue:'Atlanta',      ch:'TV4'},
+   96:{date:'7 jul', time:'22:00',venue:'Vancouver',    ch:'SVT'},
+   97:{date:'9 jul', time:'22:00',venue:'Foxborough',   ch:'TV4'},
+   98:{date:'10 jul',time:'21:00',venue:'Los Angeles',  ch:'SVT'},
+   99:{date:'11 jul',time:'23:00',venue:'Miami',        ch:'TV4'},
+  100:{date:'12 jul',time:'03:00',venue:'Kansas City',  ch:'SVT'},
+  101:{date:'14 jul',time:'21:00',venue:'Arlington',    ch:'SVT'},
+  102:{date:'15 jul',time:'21:00',venue:'Atlanta',      ch:'TV4'},
+  103:{date:'18 jul',time:'23:00',venue:'Miami',        ch:'SVT'},
+  104:{date:'19 jul',time:'21:00',venue:'New Jersey',   ch:'TV4'},
+};
+
+// ═══════════════════════════════════════
+// KNOCKOUT RESULTS  num → {homeScore, awayScore, winner, status}
+// ═══════════════════════════════════════
+let knockoutResults = {};
+
+function buildSchMap() {
+  const map = {};
+  for (const [num, s] of Object.entries(SCH)) {
+    map[`${s.date} ${s.time}`] = +num;
+  }
+  return map;
+}
+
+function processKnockoutMatches(matches) {
+  const schMap = buildSchMap();
+  knockoutResults = {};
+  const mnNames = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+  for (const m of matches) {
+    if (!m.utcDate) continue;
+    const cest = new Date(new Date(m.utcDate).getTime() + 2 * 3600000);
+    const key = `${cest.getDate()} ${mnNames[cest.getMonth()]} ${String(cest.getHours()).padStart(2,'0')}:${String(cest.getMinutes()).padStart(2,'0')}`;
+    const num = schMap[key];
+    if (!num) continue;
+    const status = m.status;
+    if (!['IN_PLAY','PAUSED','EXTRA_TIME','PENALTY_SHOOTOUT','FINISHED'].includes(status)) continue;
+    const ft = m.score?.fullTime;
+    const ht = m.score?.halfTime;
+    const home = ft?.home ?? ht?.home ?? null;
+    const away = ft?.away ?? ht?.away ?? null;
+    if (home === null && away === null) continue;
+    const w = m.score?.winner;
+    let winner = w === 'HOME_TEAM' ? 'home' : w === 'AWAY_TEAM' ? 'away' : null;
+    if (!winner && (status === 'IN_PLAY' || status === 'PAUSED')) {
+      if (home > away) winner = 'home';
+      else if (away > home) winner = 'away';
+    }
+    knockoutResults[num] = { homeScore: home, awayScore: away, winner, status };
+  }
+}
+
+// ═══════════════════════════════════════
+// FALLBACK DATA
+// ═══════════════════════════════════════
+let groupsData = [
+  {name:'A',teams:[{name:'Mexico',mp:1,w:1,d:0,l:0,gf:2,ga:0,pts:3},{name:'South Korea',mp:1,w:1,d:0,l:0,gf:2,ga:1,pts:3},{name:'Czechia',mp:1,w:0,d:0,l:1,gf:1,ga:2,pts:0},{name:'South Africa',mp:1,w:0,d:0,l:1,gf:0,ga:2,pts:0}]},
+  {name:'B',teams:[{name:'Switzerland',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1},{name:'Canada',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1},{name:'Qatar',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1},{name:'Bosnia',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1}]},
+  {name:'C',teams:[{name:'Scotland',mp:1,w:1,d:0,l:0,gf:1,ga:0,pts:3},{name:'Brazil',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1},{name:'Morocco',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1},{name:'Haiti',mp:1,w:0,d:0,l:1,gf:0,ga:1,pts:0}]},
+  {name:'D',teams:[{name:'USA',mp:1,w:1,d:0,l:0,gf:4,ga:1,pts:3},{name:'Australia',mp:1,w:1,d:0,l:0,gf:2,ga:0,pts:3},{name:'Turkiye',mp:1,w:0,d:0,l:1,gf:0,ga:2,pts:0},{name:'Paraguay',mp:1,w:0,d:0,l:1,gf:1,ga:4,pts:0}]},
+  {name:'E',teams:[{name:'Germany',mp:1,w:1,d:0,l:0,gf:7,ga:1,pts:3},{name:'Ivory Coast',mp:1,w:1,d:0,l:0,gf:1,ga:0,pts:3},{name:'Ecuador',mp:1,w:0,d:0,l:1,gf:0,ga:1,pts:0},{name:'Curacao',mp:1,w:0,d:0,l:1,gf:1,ga:7,pts:0}]},
+  {name:'F',teams:[{name:'Sweden',mp:1,w:1,d:0,l:0,gf:5,ga:1,pts:3},{name:'Netherlands',mp:1,w:0,d:1,l:0,gf:2,ga:2,pts:1},{name:'Japan',mp:1,w:0,d:1,l:0,gf:2,ga:2,pts:1},{name:'Tunisia',mp:1,w:0,d:0,l:1,gf:1,ga:5,pts:0}]},
+  {name:'G',teams:[{name:'Belgium',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1},{name:'Egypt',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1},{name:'Iran',mp:1,w:0,d:1,l:0,gf:2,ga:2,pts:1},{name:'New Zealand',mp:1,w:0,d:1,l:0,gf:2,ga:2,pts:1}]},
+  {name:'H',teams:[{name:'Spain',mp:1,w:0,d:1,l:0,gf:0,ga:0,pts:1},{name:'Cape Verde',mp:1,w:0,d:1,l:0,gf:0,ga:0,pts:1},{name:'Saudi Arabia',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1},{name:'Uruguay',mp:1,w:0,d:1,l:0,gf:1,ga:1,pts:1}]},
+  {name:'I',teams:[{name:'France',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Senegal',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Iraq',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Norway',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}]},
+  {name:'J',teams:[{name:'Argentina',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Algeria',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Austria',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Jordan',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}]},
+  {name:'K',teams:[{name:'Portugal',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'DR Congo',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Uzbekistan',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Colombia',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}]},
+  {name:'L',teams:[{name:'England',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Croatia',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Ghana',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},{name:'Panama',mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}]},
+];
+
+// ═══════════════════════════════════════
+// SORT
+// ═══════════════════════════════════════
+function sortTeams(t){
+  return [...t].sort((a,b)=>b.pts!==a.pts?b.pts-a.pts:(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+}
+// FIFA-korrekt sortering av bästa tredjeplacerade:
+// 1) Poäng  2) Målskillnad  3) Gjorda mål  4) Vinster  5) Disciplin (ej tillgängligt)  6) Lottning
+function sortBest3Teams(teams) {
+  return [...teams].sort((a, b) => {
+    if (b.pts !== a.pts) return b.pts - a.pts;
+    const gdA = a.gf - a.ga, gdB = b.gf - b.ga;
+    if (gdB !== gdA) return gdB - gdA;
+    if (b.gf !== a.gf) return b.gf - a.gf;
+    if (b.w !== a.w) return b.w - a.w;
+    return 0; // disciplin/lottning ej implementerat utan kortdata
+  });
+}
+function gdClass(g){return g>0?'gd-pos':g<0?'gd-neg':'gd-zero';}
+function posClass(p){return['','pos-1','pos-2','pos-3','pos-4'][p]||'pos-4';}
+
+// ═══════════════════════════════════════
+// FIFA 495-KOMBINATIONSTABELL (Annex C)
+// ═══════════════════════════════════════
+// Nyckel: 8 bokstäver (sorterade) för de kvalificerade gruppernas 3:or
+// Värde: 8 bokstäver [1A, 1B, 1D, 1E, 1G, 1I, 1K, 1L] = motståndar-grupp
+// Matcher: {79:0(1A), 85:1(1B), 81:2(1D), 74:3(1E), 82:4(1G), 77:5(1I), 87:6(1K), 80:7(1L)}
+const T3_MATCH_COL = {79:0, 85:1, 81:2, 74:3, 82:4, 77:5, 87:6, 80:7};
+const T3_RAW = "ABCDEFGHHGBCAFDEABCDEFGICGBDAFEIABCDEFGJCGBDAFEJABCDEFGKCGBDAFEKABCDEFGLCGBDAFLEABCDEFHIHEBCAFDIABCDEFHJHJBCAFDEABCDEFHKHEBCAFDKABCDEFHLHFBCADLEABCDEFIJCJBDAFEIABCDEFIKCEBDAFIKABCDEFILCEBDAFLIABCDEFJKCJBDAFEKABCDEFJLCJBDAFLEABCDEFKLCEBDAFLKABCDEGHIHGBCADEIABCDEGHJHGBCADEJABCDEGHKHGBCADEKABCDEGHLHGBCADLEABCDEGIJEGBCADIJABCDEGIKEGBCADIKABCDEGILEGBCADLIABCDEGJKEGBCADJKABCDEGJLEGBCADLJABCDEGKLEGBCADLKABCDEHIJHJBCADEIABCDEHIKHEBCADIKABCDEHILHEBCADLIABCDEHJKHJBCADEKABCDEHJLHJBCADLEABCDEHKLHEBCADLKABCDEIJKEJBCADIKABCDEIJLEJBCADLIABCDEIKLEIBCADLKABCDEJKLEJBCADLKABCDFGHIHGBCAFDIABCDFGHJHGBCAFDJABCDFGHKHGBCAFDKABCDFGHLCGBDAFLHABCDFGIJCGBDAFIJABCDFGIKCGBDAFIKABCDFGILCGBDAFLIABCDFGJKCGBDAFJKABCDFGJLCGBDAFLJABCDFGKLCGBDAFLKABCDFHIJHJBCAFDIABCDFHIKHFBCADIKABCDFHILHFBCADLIABCDFHJKHJBCAFDKABCDFHJLCJBDAFLHABCDFHKLHFBCADLKABCDFIJKCJBDAFIKABCDFIJLCJBDAFLIABCDFIKLCIBDAFLKABCDFJKLCJBDAFLKABCDGHIJHGBCADIJABCDGHIKHGBCADIKABCDGHILHGBCADLIABCDGHJKHGBCADJKABCDGHJLHGBCADLJABCDGHKLHGBCADLKABCDGIJKCJBDAGIKABCDGIJLCJBDAGLIABCDGIKLIGBCADLKABCDGJKLCJBDAGLKABCDHIJKHJBCADIKABCDHIJLHJBCADLIABCDHIKLHIBCADLKABCDHJKLHJBCADLKABCDIJKLIJBCADLKABCEFGHIHGBCAFEIABCEFGHJHGBCAFEJABCEFGHKHGBCAFEKABCEFGHLHGBCAFLEABCEFGIJEGBCAFIJABCEFGIKEGBCAFIKABCEFGILEGBCAFLIABCEFGJKEGBCAFJKABCEFGJLEGBCAFLJABCEFGKLEGBCAFLKABCEFHIJHJBCAFEIABCEFHIKHEBCAFIKABCEFHILHEBCAFLIABCEFHJKHJBCAFEKABCEFHJLHJBCAFLEABCEFHKLHEBCAFLKABCEFIJKEJBCAFIKABCEFIJLEJBCAFLIABCEFIKLEIBCAFLKABCEFJKLEJBCAFLKABCEGHIJHJBCAGEIABCEGHIKEGBCAHIKABCEGHILEGBCAHLIABCEGHJKHJBCAGEKABCEGHJLHJBCAGLEABCEGHKLEGBCAHLKABCEGIJKEJBCAGIKABCEGIJLEJBCAGLIABCEGIKLEGBAICLKABCEGJKLEJBCAGLKABCEHIJKEJBCAHIKABCEHIJLEJBCAHLIABCEHIKLEIBCAHLKABCEHJKLEJBCAHLKABCEIJKLEJBAICLKABCFGHIJHGBCAFIJABCFGHIKHGBCAFIKABCFGHILHGBCAFLIABCFGHJKHGBCAFJKABCFGHJLHGBCAFLJABCFGHKLHGBCAFLKABCFGIJKCJBFAGIKABCFGIJLCJBFAGLIABCFGIKLIGBCAFLKABCFGJKLCJBFAGLKABCFHIJKHJBCAFIKABCFHIJLHJBCAFLIABCFHIKLHIBCAFLKABCFHJKLHJBCAFLKABCFIJKLIJBCAFLKABCGHIJKHJBCAGIKABCGHIJLHJBCAGLIABCGHIKLIGBCAHLKABCGHJKLHJBCAGLKABCGIJKLIJBCAGLKABCHIJKLIJBCAHLKABDEFGHIHGBDAFEIABDEFGHJHGBDAFEJABDEFGHKHGBDAFEKABDEFGHLHGBDAFLEABDEFGIJEGBDAFIJABDEFGIKEGBDAFIKABDEFGILEGBDAFLIABDEFGJKEGBDAFJKABDEFGJLEGBDAFLJABDEFGKLEGBDAFLKABDEFHIJHJBDAFEIABDEFHIKHEBDAFIKABDEFHILHEBDAFLIABDEFHJKHJBDAFEKABDEFHJLHJBDAFLEABDEFHKLHEBDAFLKABDEFIJKEJBDAFIKABDEFIJLEJBDAFLIABDEFIKLEIBDAFLKABDEFJKLEJBDAFLKABDEGHIJHJBDAGEIABDEGHIKEGBDAHIKABDEGHILEGBDAHLIABDEGHJKHJBDAGEKABDEGHJLHJBDAGLEABDEGHKLEGBDAHLKABDEGIJKEJBDAGIKABDEGIJLEJBDAGLIABDEGIKLEGBAIDLKABDEGJKLEJBDAGLKABDEHIJKEJBDAHIKABDEHIJLEJBDAHLIABDEHIKLEIBDAHLKABDEHJKLEJBDAHLKABDEIJKLEJBAIDLKABDFGHIJHGBDAFIJABDFGHIKHGBDAFIKABDFGHILHGBDAFLIABDFGHJKHGBDAFJKABDFGHJLHGBDAFLJABDFGHKLHGBDAFLKABDFGIJKFJBDAGIKABDFGIJLFJBDAGLIABDFGIKLIGBDAFLKABDFGJKLFJBDAGLKABDFHIJKHJBDAFIKABDFHIJLHJBDAFLIABDFHIKLHIBDAFLKABDFHJKLHJBDAFLKABDFIJKLIJBDAFLKABDGHIJKHJBDAGIKABDGHIJLHJBDAGLIABDGHIKLIGBDAHLKABDGHJKLHJBDAGLKABDGIJKLIJBDAGLKABDHIJKLIJBDAHLKABEFGHIJHJBFAGEIABEFGHIKEGBFAHIKABEFGHILEGBFAHLIABEFGHJKHJBFAGEKABEFGHJLHJBFAGLEABEFGHKLEGBFAHLKABEFGIJKEJBFAGIKABEFGIJLEJBFAGLIABEFGIKLEGBAIFLKABEFGJKLEJBFAGLKABEFHIJKEJBFAHIKABEFHIJLEJBFAHLIABEFHIKLEIBFAHLKABEFHJKLEJBFAHLKABEFIJKLEJBAIFLKABEGHIJKEJBAHGIKABEGHIJLEJBAHGLIABEGHIKLEGBAIHLKABEGHJKLEJBAHGLKABEGIJKLEJBAIGLKABEHIJKLEJBAIHLKABFGHIJKHJBFAGIKABFGHIJLHJBFAGLIABFGHIKLHGBAIFLKABFGHJKLHJBFAGLKABFGIJKLIJBFAGLKABFHIJKLHJBAIFLKABGHIJKLHJBAIGLKACDEFGHIHGECAFDIACDEFGHJHGJCAFDEACDEFGHKHGECAFDKACDEFGHLHGFCADLEACDEFGIJCGJDAFEIACDEFGIKCGEDAFIKACDEFGILCGEDAFLIACDEFGJKCGJDAFEKACDEFGJLCGJDAFLEACDEFGKLCGEDAFLKACDEFHIJHJECAFDIACDEFHIKHEFCADIKACDEFHILHEFCADLIACDEFHJKHJECAFDKACDEFHJLHJFCADLEACDEFHKLHEFCADLKACDEFIJKCJEDAFIKACDEFIJLCJEDAFLIACDEFIKLCEIDAFLKACDEFJKLCJEDAFLKACDEGHIJHGJCADEIACDEGHIKHGECADIKACDEGHILHGECADLIACDEGHJKHGJCADEKACDEGHJLHGJCADLEACDEGHKLHGECADLKACDEGIJKEGJCADIKACDEGIJLEGJCADLIACDEGIKLEGICADLKACDEGJKLEGJCADLKACDEHIJKHJECADIKACDEHIJLHJECADLIACDEHIKLHEICADLKACDEHJKLHJECADLKACDEIJKLEJICADLKACDFGHIJHGJCAFDIACDFGHIKHGFCADIKACDFGHILHGFCADLIACDFGHJKHGJCAFDKACDFGHJLCGJDAFLHACDFGHKLHGFCADLKACDFGIJKCGJDAFIKACDFGIJLCGJDAFLIACDFGIKLCGIDAFLKACDFGJKLCGJDAFLKACDFHIJKHJFCADIKACDFHIJLHJFCADLIACDFHIKLHFICADLKACDFHJKLHJFCADLKACDFIJKLCJIDAFLKACDGHIJKHGJCADIKACDGHIJLHGJCADLIACDGHIKLHGICADLKACDGHJKLHGJCADLKACDGIJKLIGJCADLKACDHIJKLHJICADLKACEFGHIJHGJCAFEIACEFGHIKHGECAFIKACEFGHILHGECAFLIACEFGHJKHGJCAFEKACEFGHJLHGJCAFLEACEFGHKLHGECAFLKACEFGIJKEGJCAFIKACEFGIJLEGJCAFLIACEFGIKLEGICAFLKACEFGJKLEGJCAFLKACEFHIJKHJECAFIKACEFHIJLHJECAFLIACEFHIKLHEICAFLKACEFHJKLHJECAFLKACEFIJKLEJICAFLKACEGHIJKEGJCAHIKACEGHIJLEGJCAHLIACEGHIKLEGICAHLKACEGHJKLEGJCAHLKACEGIJKLEJICAGLKACEHIJKLEJICAHLKACFGHIJKHGJCAFIKACFGHIJLHGJCAFLIACFGHIKLHGICAFLKACFGHJKLHGJCAFLKACFGIJKLIGJCAFLKACFHIJKLHJICAFLKACGHIJKLHJICAGLKADEFGHIJHGJDAFEIADEFGHIKHGEDAFIKADEFGHILHGEDAFLIADEFGHJKHGJDAFEKADEFGHJLHGJDAFLEADEFGHKLHGEDAFLKADEFGIJKEGJDAFIKADEFGIJLEGJDAFLIADEFGIKLEGIDAFLKADEFGJKLEGJDAFLKADEFHIJKHJEDAFIKADEFHIJLHJEDAFLIADEFHIKLHEIDAFLKADEFHJKLHJEDAFLKADEFIJKLEJIDAFLKADEGHIJKEGJDAHIKADEGHIJLEGJDAHLIADEGHIKLEGIDAHLKADEGHJKLEGJDAHLKADEGIJKLEJIDAGLKADEHIJKLEJIDAHLKADFGHIJKHGJDAFIKADFGHIJLHGJDAFLIADFGHIKLHGIDAFLKADFGHJKLHGJDAFLKADFGIJKLIGJDAFLKADFHIJKLHJIDAFLKADGHIJKLHJIDAGLKAEFGHIJKEGJFAHIKAEFGHIJLEGJFAHLIAEFGHIKLEGIFAHLKAEFGHJKLEGJFAHLKAEFGIJKLEJIFAGLKAEFHIJKLEJIFAHLKAEGHIJKLEJIAHGLKAFGHIJKLHJIFAGLKBCDEFGHICGBDHFEIBCDEFGHJHGBCJFDEBCDEFGHKCGBDHFEKBCDEFGHLCGBDHFLEBCDEFGIJCGBDJFEIBCDEFGIKCGBDEFIKBCDEFGILCGBDEFLIBCDEFGJKCGBDJFEKBCDEFGJLCGBDJFLEBCDEFGKLCGBDEFLKBCDEFHIJCJBDHFEIBCDEFHIKCEBDHFIKBCDEFHILCEBDHFLIBCDEFHJKCJBDHFEKBCDEFHJLCJBDHFLEBCDEFHKLCEBDHFLKBCDEFIJKCJBDEFIKBCDEFIJLCJBDEFLIBCDEFIKLCEBDIFLKBCDEFJKLCJBDEFLKBCDEGHIJHGBCJDEIBCDEGHIKEGBCHDIKBCDEGHILEGBCHDLIBCDEGHJKHGBCJDEKBCDEGHJLHGBCJDLEBCDEGHKLEGBCHDLKBCDEGIJKEGBCJDIKBCDEGIJLEGBCJDLIBCDEGIKLEGBCIDLKBCDEGJKLEGBCJDLKBCDEHIJKEJBCHDIKBCDEHIJLEJBCHDLIBCDEHIKLEIBCHDLKBCDEHJKLEJBCHDLKBCDEIJKLEJBCIDLKBCDFGHIJHGBCJFDIBCDFGHIKCGBDHFIKBCDFGHILCGBDHFLIBCDFGHJKHGBCJFDKBCDFGHJLCGBDHFLJBCDFGHKLCGBDHFLKBCDFGIJKCGBDJFIKBCDFGIJLCGBDJFLIBCDFGIKLCGBDIFLKBCDFGJKLCGBDJFLKBCDFHIJKCJBDHFIKBCDFHIJLCJBDHFLIBCDFHIKLCIBDHFLKBCDFHJKLCJBDHFLKBCDFIJKLCJBDIFLKBCDGHIJKHGBCJDIKBCDGHIJLHGBCJDLIBCDGHIKLHGBCIDLKBCDGHJKLHGBCJDLKBCDGIJKLIGBCJDLKBCDHIJKLHJBCIDLKBCEFGHIJHGBCJFEIBCEFGHIKEGBCHFIKBCEFGHILEGBCHFLIBCEFGHJKHGBCJFEKBCEFGHJLHGBCJFLEBCEFGHKLEGBCHFLKBCEFGIJKEGBCJFIKBCEFGIJLEGBCJFLIBCEFGIKLEGBCIFLKBCEFGJKLEGBCJFLKBCEFHIJKEJBCHFIKBCEFHIJLEJBCHFLIBCEFHIKLEIBCHFLKBCEFHJKLEJBCHFLKBCEFIJKLEJBCIFLKBCEGHIJKEJBCHGIKBCEGHIJLEJBCHGLIBCEGHIKLEGBCIHLKBCEGHJKLEJBCHGLKBCEGIJKLEJBCIGLKBCEHIJKLEJBCIHLKBCFGHIJKHGBCJFIKBCFGHIJLHGBCJFLIBCFGHIKLHGBCIFLKBCFGHJKLHGBCJFLKBCFGIJKLIGBCJFLKBCFHIJKLHJBCIFLKBCGHIJKLHJBCIGLKBDEFGHIJHGBDJFEIBDEFGHIKEGBDHFIKBDEFGHILEGBDHFLIBDEFGHJKHGBDJFEKBDEFGHJLHGBDJFLEBDEFGHKLEGBDHFLKBDEFGIJKEGBDJFIKBDEFGIJLEGBDJFLIBDEFGIKLEGBDIFLKBDEFGJKLEGBDJFLKBDEFHIJKEJBDHFIKBDEFHIJLEJBDHFLIBDEFHIKLEIBDHFLKBDEFHJKLEJBDHFLKBDEFIJKLEJBDIFLKBDEGHIJKEJBDHGIKBDEGHIJLEJBDHGLIBDEGHIKLEGBDIHLKBDEGHJKLEJBDHGLKBDEGIJKLEJBDIGLKBDEHIJKLEJBDIHLKBDFGHIJKHGBDJFIKBDFGHIJLHGBDJFLIBDFGHIKLHGBDIFLKBDFGHJKLHGBDJFLKBDFGIJKLIGBDJFLKBDFHIJKLHJBDIFLKBDGHIJKLHJBDIGLKBEFGHIJKEJBFHGIKBEFGHIJLEJBFHGLIBEFGHIKLEGBFIHLKBEFGHJKLEJBFHGLKBEFGIJKLEJBFIGLKBEFHIJKLEJBFIHLKBEGHIJKLEJIBHGLKBFGHIJKLHJBFIGLKCDEFGHIJCGJDHFEICDEFGHIKCGEDHFIKCDEFGHILCGEDHFLICDEFGHJKCGJDHFEKCDEFGHJLCGJDHFLECDEFGHKLCGEDHFLKCDEFGIJKCGEDJFIKCDEFGIJLCGEDJFLICDEFGIKLCGEDIFLKCDEFGJKLCGEDJFLKCDEFHIJKCJEDHFIKCDEFHIJLCJEDHFLICDEFHIKLCEIDHFLKCDEFHJKLCJEDHFLKCDEFIJKLCJEDIFLKCDEGHIJKEGJCHDIKCDEGHIJLEGJCHDLICDEGHIKLEGICHDLKCDEGHJKLEGJCHDLKCDEGIJKLEGICJDLKCDEHIJKLEJICHDLKCDFGHIJKCGJDHFIKCDFGHIJLCGJDHFLICDFGHIKLCGIDHFLKCDFGHJKLCGJDHFLKCDFGIJKLCGIDJFLKCDFHIJKLCJIDHFLKCDGHIJKLHGICJDLKCEFGHIJKEGJCHFIKCEFGHIJLEGJCHFLICEFGHIKLEGICHFLKCEFGHJKLEGJCHFLKCEFGIJKLEGICJFLKCEFHIJKLEJICHFLKCEGHIJKLEJICHGLKCFGHIJKLHGICJFLKDEFGHIJKEGJDHFIKDEFGHIJLEGJDHFLIDEFGHIKLEGIDHFLKDEFGHJKLEGJDHFLKDEFGIJKLEGIDJFLKDEFHIJKLEJIDHFLKDEGHIJKLEJIDHGLKDFGHIJKLHGIDJFLKEFGHIJKLEJIFHGLK";
+const T3 = {};
+for (let i = 0; i < T3_RAW.length; i += 16) T3[T3_RAW.slice(i,i+8)] = T3_RAW.slice(i+8,i+16);
+
+// Returnerar 3:e-plats-laget som möter grupvinnaren i given match
+function getThirdForMatch(matchNum) {
+  const colIdx = T3_MATCH_COL[matchNum];
+  if (colIdx === undefined) return null;
+  // Bygg kandidatlista: 3:a i varje grupp med sin grupptillhörighet
+  const candidates = groupsData.map(g => {
+    const t = sortTeams(g.teams)[2];
+    return t ? {team: t, group: g.name} : null;
+  }).filter(Boolean);
+  if (candidates.length < 8) return null;
+  // Sortera efter FIFA-kriterier, ta topp-8
+  const sorted = sortBest3Teams(candidates.map(c => c.team));
+  const top8 = sorted.slice(0, 8).map(t => candidates.find(c => c.team === t)).filter(Boolean);
+  if (top8.length < 8) return null;
+  // Slå upp i 495-kombinationstabellen
+  const key = top8.map(c => c.group).sort().join('');
+  const vals = T3[key];
+  if (!vals) return null;
+  const targetGroup = vals[colIdx];
+  const match = candidates.find(c => c.group === targetGroup);
+  return match ? match.team : null;
+}
+
+// ═══════════════════════════════════════
+// BRACKET ZOOM
+// ═══════════════════════════════════════
+let bracketZoom = 1.0;
+function applyZoom() {
+  const scroll = document.getElementById('bracket-scroll');
+  if (!scroll) return;
+  scroll.style.zoom = bracketZoom;
+  const lbl = document.getElementById('zoom-label');
+  if (lbl) lbl.textContent = Math.round(bracketZoom * 100) + '%';
+}
+function zoomBracket(delta) {
+  bracketZoom = Math.max(0.25, Math.min(2.0, bracketZoom + delta));
+  applyZoom();
+}
+function fitBracket() {
+  const outer = document.getElementById('bracket-outer');
+  const stage = document.getElementById('bracket-stage');
+  if (!outer || !stage) return;
+  const stageW = parseFloat(stage.style.width) || 1723;
+  const availW = outer.clientWidth - 4;
+  bracketZoom = Math.max(0.25, Math.min(1.0, availW / stageW));
+  applyZoom();
+}
+
+// ═══════════════════════════════════════
+// BRACKET LAYOUT ENGINE
+// ═══════════════════════════════════════
+const CW = 155;
+const CH = 66;
+const COL_GAP = 36;
+const HDR_H = 24;
+
+function buildBracket() {
+  const stage = document.getElementById('bracket-stage');
+  stage.innerHTML = '';
+
+  function gq(n){ const g=groupsData.find(x=>x.name===n); return g?sortTeams(g.teams):[]; }
+  function g1(n){ return gq(n)[0]||null; }
+  function g2(n){ return gq(n)[1]||null; }
+  function best3(i){
+    const thirds = groupsData.map(g => sortTeams(g.teams)[2]).filter(Boolean);
+    return sortBest3Teams(thirds)[i] || null;
+  }
+
+  // R32 matchups per side
+  // Left side (top bracket): matches 73,76,79,80,81,82,74,75 — 8 matches
+  // Right side (bottom bracket): matches 77,78,83,84,85,86,87,88
+  // 3:e-plats-motståndet väljs via FIFAs 495-kombinationstabell (getThirdForMatch)
+  const leftR32 = [
+    {num:73, a:()=>g2('A'),   b:()=>g2('B')},
+    {num:76, a:()=>g1('C'),   b:()=>g2('F')},
+    {num:79, a:()=>g1('A'),   b:()=>getThirdForMatch(79)},
+    {num:80, a:()=>g1('L'),   b:()=>getThirdForMatch(80)},
+    {num:81, a:()=>g1('D'),   b:()=>getThirdForMatch(81)},
+    {num:82, a:()=>g1('G'),   b:()=>getThirdForMatch(82)},
+    {num:74, a:()=>g1('E'),   b:()=>getThirdForMatch(74)},
+    {num:75, a:()=>g1('F'),   b:()=>g2('C')},
+  ];
+  const rightR32 = [
+    {num:77, a:()=>g1('I'),   b:()=>getThirdForMatch(77)},
+    {num:78, a:()=>g2('E'),   b:()=>g2('I')},
+    {num:83, a:()=>g2('K'),   b:()=>g2('L')},
+    {num:84, a:()=>g1('H'),   b:()=>g2('J')},
+    {num:85, a:()=>g1('B'),   b:()=>getThirdForMatch(85)},
+    {num:86, a:()=>g1('J'),   b:()=>g2('H')},
+    {num:87, a:()=>g1('K'),   b:()=>getThirdForMatch(87)},
+    {num:88, a:()=>g2('D'),   b:()=>g2('G')},
+  ];
+
+  // Rounds per side: R32(8), R16(4), QF(2), SF(1)
+  // Right side R16: 93,94,95,96  QF:99,100  SF:102
+  // Left side R16:  89,90,91,92  QF:97,98   SF:101
+  const leftR16  = [89,90,91,92];
+  const leftQF   = [97,98];
+  const leftSF   = [101];
+  const rightR16 = [93,94,95,96];
+  const rightQF  = [99,100];
+  const rightSF  = [102];
+  const FINAL    = 104;
+  const THIRD    = 103;
+
+  // ── Layout math ──
+  // 8 R32 cards per side, each CH tall.
+  // Total usable height = 8*CH + 7*gap32
+  // We want gap between consecutive R32 cards = 8px
+  const GAP32 = 8;
+  const totalH = 8*CH + 7*GAP32;
+
+  // Number of rounds per side = 4 (R32, R16, QF, SF)
+  // Total columns: 4 left + center + 4 right = 9 cols
+  // Center = final + trophy
+  const CENTER_W = CW + 40; // final card + padding
+  const sideW = 4*(CW + COL_GAP);
+  const totalW = sideW*2 + CENTER_W;
+
+  const BRACKET_TOP = HDR_H + 10;
+  const stageH = BRACKET_TOP + totalH + 60; // extra bottom for 3rd place
+
+  stage.style.width  = totalW + 'px';
+  stage.style.height = stageH + 'px';
+
+  // ── SVG connector lines ──
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', stageH);
+  svg.classList.add('b-svg');
+  stage.appendChild(svg);
+
+  const lineColor = '#1e4a2d';
+  const lineColorActive = '#c9a227';
+
+  function line(x1,y1,x2,y2){
+    const l = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    l.setAttribute('points',`${x1},${y1} ${x2},${y2}`);
+    l.setAttribute('stroke', lineColor);
+    l.setAttribute('stroke-width','1.5');
+    l.setAttribute('fill','none');
+    svg.appendChild(l);
+  }
+  function bracket(x1,y1,x2,y2,x3,y3){
+    // right-angle connector: from (x1,y1) right to midX, then to (x2,midY between y1&y2), then to (x3,y3)
+    const mx = (x1+x3)/2;
+    const my = (y1+y2)/2;
+    const l = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    l.setAttribute('points',`${x1},${y1} ${mx},${y1} ${mx},${y2} ${x3},${y2}`);
+    l.setAttribute('stroke', lineColor);
+    l.setAttribute('stroke-width','1.5');
+    l.setAttribute('fill','none');
+    svg.appendChild(l);
+  }
+
+  // ── Round header labels ──
+  const roundNames = ['Omg. 32','Omg. 16','Kvarts','Semifinal'];
+
+  // LEFT headers (left to right)
+  for(let r=0;r<4;r++){
+    const x = r*(CW+COL_GAP);
+    const hdr = document.createElement('div');
+    hdr.className = 'b-round-hdr';
+    hdr.style.cssText = `position:absolute;top:0;left:${x}px;width:${CW}px;`;
+    hdr.textContent = roundNames[r];
+    stage.appendChild(hdr);
+  }
+  // RIGHT headers (right to left, mirrored)
+  for(let r=0;r<4;r++){
+    const x = totalW - sideW + r*(CW+COL_GAP);
+    const hdr = document.createElement('div');
+    hdr.className = 'b-round-hdr';
+    hdr.style.cssText = `position:absolute;top:0;left:${x}px;width:${CW}px;`;
+    hdr.textContent = roundNames[r];
+    stage.appendChild(hdr);
+  }
+  // Center header
+  const chdr = document.createElement('div');
+  chdr.className = 'b-round-hdr';
+  chdr.style.cssText = `position:absolute;top:0;left:${sideW}px;width:${CENTER_W}px;text-align:center;color:var(--gold-light);`;
+  chdr.textContent = 'FINAL';
+  stage.appendChild(chdr);
+
+  // ── Card builder ──
+  function makeCard(num, teamA, teamB, isFinal=false){
+    const s = SCH[num] || {};
+    const res = knockoutResults[num] || null;
+    const card = document.createElement('div');
+    card.className = 'b-card' + (isFinal ? ' final-card' : '');
+
+    const wd = getWeekday(s.date || '');
+    const dateStr = wd && s.date ? `${wd} ${s.date}` : (s.date || '');
+    const chClass = s.ch === 'SVT' ? 'ch-svt' : 'ch-tv4';
+
+    function row(t, side) {
+      const score = res ? (side === 'home' ? res.homeScore : res.awayScore) : null;
+      const scoreHtml = score !== null ? `<span class="b-score">${score}</span>` : '';
+      const isWinner = !!(res && res.winner === side);
+      if (!t) return `<div class="b-team tbd"><span class="b-eflag">–</span><span class="b-ename">TBD</span>${scoreHtml}</div>`;
+      return `<div class="b-team${isWinner ? ' winner' : ''}"><span class="b-eflag">${F(t.name)}</span><span class="b-ename">${t.name}</span>${scoreHtml}</div>`;
+    }
+    card.innerHTML = `${row(teamA,'home')}${row(teamB,'away')}
+      <div class="b-meta">
+        <span class="b-ch ${chClass}">${s.ch||''}</span>
+        <span class="b-date">${dateStr}</span>
+        <span class="b-time">${s.time||'TBD'}</span>
+        <span class="b-venue">${s.venue||''}</span>
+        <span class="b-num">#${num}</span>
+      </div>`;
+    return card;
+  }
+
+  // ── Place card absolutely ──
+  function placeCard(card, x, y, w=CW, h=CH){
+    card.style.cssText = `left:${x}px;top:${y}px;width:${w}px;`;
+    stage.appendChild(card);
+    return {x, y, w, h, cx: x+w, cy: y+CH*0.5}; // cx = right edge, cy = vertical midpoint of team rows
+  }
+
+  // ── Left side: place R32, then R16, QF, SF ──
+  // R32: evenly spaced, 8 cards
+  const leftR32Pos = [];
+  for(let i=0;i<8;i++){
+    const y = BRACKET_TOP + i*(CH+GAP32);
+    const x = 0;
+    const card = makeCard(leftR32[i].num, leftR32[i].a(), leftR32[i].b());
+    const pos = placeCard(card, x, y);
+    leftR32Pos.push(pos);
+  }
+
+  // R16: 4 cards, each centered between pairs of R32
+  const leftR16Pos = [];
+  for(let i=0;i<4;i++){
+    const topCard = leftR32Pos[i*2];
+    const botCard = leftR32Pos[i*2+1];
+    const midY = (topCard.y + botCard.y + CH) / 2 - CH/2;
+    const x = CW + COL_GAP;
+    const card = makeCard(leftR16[i]);
+    const pos = placeCard(card, x, midY);
+    leftR16Pos.push(pos);
+
+    // Connectors: right edge of R32 pair → left edge of R16
+    const midX = CW + COL_GAP/2;
+    line(CW, topCard.y+CH*0.4, midX, topCard.y+CH*0.4);
+    line(CW, botCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, topCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, (topCard.y+botCard.y+CH)/2, x, (topCard.y+botCard.y+CH)/2);
+  }
+
+  // QF: 2 cards centered between pairs of R16
+  const leftQFPos = [];
+  for(let i=0;i<2;i++){
+    const topCard = leftR16Pos[i*2];
+    const botCard = leftR16Pos[i*2+1];
+    const midY = (topCard.y + botCard.y + CH) / 2 - CH/2;
+    const x = 2*(CW+COL_GAP);
+    const card = makeCard(leftQF[i]);
+    const pos = placeCard(card, x, midY);
+    leftQFPos.push(pos);
+
+    const rx = 2*(CW+COL_GAP);
+    const midX = rx - COL_GAP/2;
+    line(rx-COL_GAP, topCard.y+CH*0.4, midX, topCard.y+CH*0.4);
+    line(rx-COL_GAP, botCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, topCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, (topCard.y+botCard.y+CH)/2, rx, (topCard.y+botCard.y+CH)/2);
+  }
+
+  // SF: 1 card centered between the 2 QF cards
+  const topCard = leftQFPos[0];
+  const botCard = leftQFPos[1];
+  const sfMidY = (topCard.y + botCard.y + CH) / 2 - CH/2;
+  const sfX = 3*(CW+COL_GAP);
+  const leftSFCard = makeCard(leftSF[0]);
+  const leftSFPos = placeCard(leftSFCard, sfX, sfMidY);
+  {
+    const rx = sfX;
+    const midX = rx - COL_GAP/2;
+    line(rx-COL_GAP, topCard.y+CH*0.4, midX, topCard.y+CH*0.4);
+    line(rx-COL_GAP, botCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, topCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, sfMidY+CH*0.4, rx, sfMidY+CH*0.4);
+  }
+
+  // ── Right side (mirror) ──
+  const rightR32Pos = [];
+  for(let i=0;i<8;i++){
+    const y = BRACKET_TOP + i*(CH+GAP32);
+    const x = totalW - CW; // right-aligned
+    const card = makeCard(rightR32[i].num, rightR32[i].a(), rightR32[i].b());
+    const pos = placeCard(card, x, y);
+    // Override cx to left edge for right-side connectors
+    pos.cx = x;
+    rightR32Pos.push(pos);
+  }
+
+  const rightR16Pos = [];
+  for(let i=0;i<4;i++){
+    const topCard = rightR32Pos[i*2];
+    const botCard = rightR32Pos[i*2+1];
+    const midY = (topCard.y + botCard.y + CH) / 2 - CH/2;
+    const x = totalW - 2*CW - COL_GAP;
+    const card = makeCard(rightR16[i]);
+    const pos = placeCard(card, x, midY);
+    pos.cx = x;
+    rightR16Pos.push(pos);
+
+    const lx = totalW - CW;
+    const midX = lx - COL_GAP/2;
+    line(lx, topCard.y+CH*0.4, midX, topCard.y+CH*0.4);
+    line(lx, botCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, topCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, (topCard.y+botCard.y+CH)/2, x+CW, (topCard.y+botCard.y+CH)/2);
+  }
+
+  const rightQFPos = [];
+  for(let i=0;i<2;i++){
+    const topCard = rightR16Pos[i*2];
+    const botCard = rightR16Pos[i*2+1];
+    const midY = (topCard.y + botCard.y + CH) / 2 - CH/2;
+    const x = totalW - 3*CW - 2*COL_GAP;
+    const card = makeCard(rightQF[i]);
+    const pos = placeCard(card, x, midY);
+    pos.cx = x;
+    rightQFPos.push(pos);
+
+    const lx = topCard.cx + CW;
+    const midX = lx + COL_GAP/2;
+    line(lx, topCard.y+CH*0.4, midX, topCard.y+CH*0.4);
+    line(lx, botCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, topCard.y+CH*0.4, midX, botCard.y+CH*0.4);
+    line(midX, (topCard.y+botCard.y+CH)/2, x+CW, (topCard.y+botCard.y+CH)/2);
+  }
+
+  const rtopCard = rightQFPos[0];
+  const rbotCard = rightQFPos[1];
+  const rsfMidY = (rtopCard.y + rbotCard.y + CH) / 2 - CH/2;
+  const rsfX = totalW - 4*CW - 3*COL_GAP;
+  const rightSFCard = makeCard(rightSF[0]);
+  const rightSFPos = placeCard(rightSFCard, rsfX, rsfMidY);
+  rightSFPos.cx = rsfX;
+  {
+    const lx = rtopCard.cx + CW;
+    const midX = lx + COL_GAP/2;
+    line(lx, rtopCard.y+CH*0.4, midX, rtopCard.y+CH*0.4);
+    line(lx, rbotCard.y+CH*0.4, midX, rbotCard.y+CH*0.4);
+    line(midX, rtopCard.y+CH*0.4, midX, rbotCard.y+CH*0.4);
+    line(midX, rsfMidY+CH*0.4, rsfX+CW, rsfMidY+CH*0.4);
+  }
+
+  // ── Final: centered ──
+  const finalY = (leftSFPos.y + rightSFPos.y) / 2;  // align with SF midpoints
+  const finalX = sideW + (CENTER_W - CW) / 2;
+  const finalCard = makeCard(FINAL, null, null, true);
+  placeCard(finalCard, finalX, finalY, CW);
+
+  // SF → Final connectors (left SF right edge → final left; right SF left edge → final right)
+  const finalMidY = finalY + CH*0.4;
+  line(sfX+CW, leftSFPos.y+CH*0.4, finalX, leftSFPos.y+CH*0.4);
+  line(rsfX,   rightSFPos.y+CH*0.4, finalX+CW, rightSFPos.y+CH*0.4);
+
+  // Trophy above final
+  const trophy = document.createElement('div');
+  trophy.className = 'b-trophy';
+  trophy.style.cssText = `left:${finalX}px;top:${BRACKET_TOP-4}px;width:${CW}px;`;
+  trophy.innerHTML = '<span>🏆</span>';
+  stage.appendChild(trophy);
+
+  // ── 3rd place ──
+  const thirdY = stageH - 50;
+  const thirdX = finalX;
+  const thirdCard = makeCard(THIRD, null, null, false);
+  placeCard(thirdCard, thirdX, thirdY, CW);
+  const tLabel = document.createElement('div');
+  tLabel.style.cssText = `position:absolute;left:${thirdX}px;top:${thirdY-14}px;width:${CW}px;text-align:center;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);`;
+  tLabel.textContent = '3:e plats · 18 jul';
+  stage.appendChild(tLabel);
+
+  // Fit to screen after building
+  requestAnimationFrame(fitBracket);
+}
+
+// ═══════════════════════════════════════
+// RENDER GRUPPER
+// ═══════════════════════════════════════
+function renderGroups(){
+  const cont=document.getElementById('groups-container');
+  cont.innerHTML='';
+  // Deduplicera (skyddar mot dubbla poster vid snabba uppdateringar)
+  const seen=new Set();
+  const uniqueGroups=groupsData.filter(g=>{if(seen.has(g.name))return false;seen.add(g.name);return true;});
+
+  // Räkna ut vilka tredjeplacerade som är bland de bästa 8 just nu
+  const allThirds=uniqueGroups.map(g=>{const t=sortTeams(g.teams)[2];return t?{team:t,group:g.name}:null;}).filter(Boolean);
+  const top8Names=new Set(sortBest3Teams(allThirds.map(c=>c.team)).slice(0,8).map(t=>t.name));
+
+  uniqueGroups.forEach(group=>{
+    const sorted=sortTeams(group.teams);
+    const played=sorted.reduce((s,t)=>s+t.mp,0)/2;
+    const card=document.createElement('div');
+    card.className='group-card';
+    card.innerHTML=`
+      <div class="group-header">
+        <span class="group-name">Grupp ${group.name}</span>
+        <span class="group-played">${played>0?played+' matcher spelade':'Ej spelat'}</span>
+      </div>
+      <table class="standings-table">
+        <thead><tr><th>Lag</th><th>M</th><th>V</th><th>O</th><th>F</th><th>MS</th><th>P</th></tr></thead>
+        <tbody>${sorted.map((t,i)=>{const pos=i+1,gd=t.gf-t.ga;
+          const cls=pos===3?(top8Names.has(t.name)?'pos-3':'pos-4'):posClass(pos);
+          return`<tr>
+          <td><div class="team-cell">
+            <span class="pos-badge ${cls}">${pos}</span>
+            <span class="flag">${F(t.name)}</span>
+            <span class="team-name">${t.name}</span>
+          </div></td>
+          <td>${t.mp}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+          <td class="${gdClass(gd)}">${gd>0?'+':''}${gd}</td>
+          <td class="pts-cell">${t.pts}</td>
+        </tr>`;}).join('')}</tbody>
+      </table>`;
+    cont.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════
+// DATA FETCH
+// ═══════════════════════════════════════
+let fetchInProgress = false;
+
+async function fetchData() {
+  if (fetchInProgress) return;
+  fetchInProgress = true;
+
+  const btn=document.getElementById('refresh-btn');
+  const statusEl=document.getElementById('status');
+  const statusText=document.getElementById('status-text');
+  const errorArea=document.getElementById('error-area');
+
+  btn.disabled=true;
+  statusEl.classList.remove('hidden');
+  statusText.textContent='Hämtar resultat från football-data.org…';
+  errorArea.innerHTML='';
+
+  try {
+    const data = await apiFetch('/competitions/WC/standings');
+    const standings = data.standings;
+    if (!standings||standings.length===0)
+      throw new Error('Inga gruppdata — kontrollera att VM ingår i din plan på football-data.org.');
+
+    standings.forEach(group=>{
+      const letter=(group.group||'').replace(/^GROUP_?/i,'').trim().toUpperCase();
+      if(!letter) return;
+      const teams=group.table.map(r=>({
+        name:r.team.name, mp:r.playedGames, w:r.won, d:r.draw, l:r.lost,
+        gf:r.goalsFor, ga:r.goalsAgainst, pts:r.points,
+      }));
+      const idx=groupsData.findIndex(g=>g.name===letter);
+      if(idx>=0) groupsData[idx]={name:letter,teams};
+      else groupsData.push({name:letter,teams});
+    });
+
+    // Hämta slutspelsresultat
+    try {
+      statusText.textContent = 'Hämtar slutspelsresultat…';
+      const matchData = await apiFetch('/competitions/WC/matches');
+      if (matchData && matchData.matches) processKnockoutMatches(matchData.matches);
+    } catch(e) { /* ignorera tyst */ }
+
+    renderGroups();
+    buildBracket();
+
+    const now=new Date();
+    document.getElementById('last-update').textContent=
+      `Uppdaterad ${now.toLocaleString('sv-SE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
+    localStorage.setItem('vm2026_lastFetch', now.toISOString());
+
+  } catch(err){
+    const isLocal = window.location.protocol==='file:';
+    const notProxy = window.location.port!=='8765';
+    let msg = err.message;
+    if((msg.includes('fetch')||msg.includes('Failed'))&&(isLocal||notProxy)){
+      msg=`Kunde inte nå API:et. Kör <code>python3 server.py</code> och öppna <a href="http://localhost:8765" style="color:var(--gold)">http://localhost:8765</a>.`;
+    }
+    errorArea.innerHTML=`<div class="error-box">⚠️ ${msg}</div>`;
+    renderGroups();
+    buildBracket();
+  } finally {
+    fetchInProgress=false;
+    btn.disabled=false;
+    statusEl.classList.add('hidden');
+  }
+}
+
+function manualRefresh(){ fetchInProgress=false; fetchData(); }
+
+// ═══════════════════════════════════════
+// AUTO-REFRESH KL 07:00
+// ═══════════════════════════════════════
+function scheduleAutoRefresh(){
+  const now=new Date();
+  const lastFetch=localStorage.getItem('vm2026_lastFetch');
+  const todayAt7=new Date(now); todayAt7.setHours(7,0,0,0);
+
+  // Rensa alltid det statiska felmeddelandets HTML
+  document.getElementById('error-area').innerHTML='';
+
+  if(lastFetch && new Date(lastFetch)>=todayAt7){
+    document.getElementById('last-update').textContent=
+      `Uppdaterad ${new Date(lastFetch).toLocaleString('sv-SE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
+    scheduleTomorrow(); return;
+  }
+  if(now>=todayAt7){ fetchData().then(scheduleTomorrow); }
+  else { setTimeout(()=>fetchData().then(scheduleTomorrow), todayAt7-now); }
+}
+function scheduleTomorrow(){
+  const t=new Date(); t.setDate(t.getDate()+1); t.setHours(7,0,0,0);
+  setTimeout(()=>fetchData().then(scheduleTomorrow), t-new Date());
+}
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='bracket'){
+    buildBracket(); // rebuild on tab switch for correct sizing
+  }
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+renderGroups();
+buildBracket();
+scheduleAutoRefresh();
+</script>
+
+
+</body></html>
