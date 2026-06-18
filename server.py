@@ -13,7 +13,7 @@ import os
 
 API_TOKEN = os.environ.get('FOOTBALL_API_TOKEN', '634a7a50cdbd4cba8205ca185ab8c78d')
 API_BASE  = 'https://api.football-data.org/v4'
-PORT      = 8765
+PORT      = int(os.environ.get('PORT', 8765))
 HTML_FILE = 'vm2026.html'   # måste ligga i samma mapp som server.py
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -83,4 +83,4 @@ if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     print(f'VM 2026-server startad → http://localhost:{PORT}')
     print(f'Tryck Ctrl+C för att stoppa.\n')
-    http.server.HTTPServer(('localhost', PORT), Handler).serve_forever()
+    http.server.HTTPServer(('0.0.0.0', PORT), Handler).serve_forever()
