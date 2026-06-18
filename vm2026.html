@@ -155,6 +155,31 @@
   .zoom-fit{font-size:10px!important;width:auto!important;padding:0 10px!important;letter-spacing:.5px;}
   .bracket-outer{overflow:auto;width:100%;}
   .bracket-scroll{padding:8px 0 20px;}
+
+  /* ── Mobil slutspelsvy ── */
+  .mobile-bracket{display:none;}
+  .m-round-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scrollbar-width:none;}
+  .m-round-tabs::-webkit-scrollbar{display:none;}
+  .m-round-btn{background:var(--card);border:1px solid var(--card-border);color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:8px 14px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+  .m-round-btn.active{background:var(--gold);border-color:var(--gold);color:#000;}
+  .m-round-btn:hover:not(.active){border-color:var(--gold);color:var(--white);}
+  .m-match-list{display:flex;flex-direction:column;gap:10px;}
+  .m-match-card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;overflow:hidden;}
+  .m-match-team{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;}
+  .m-match-team+.m-match-team{border-top:1px solid var(--card-border);}
+  .m-match-team.winner{background:rgba(201,162,39,.08);}
+  .m-team-left{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;}
+  .m-team-flag{font-size:18px;line-height:1;}
+  .m-score{font-size:18px;font-weight:700;color:var(--gold);min-width:20px;text-align:right;}
+  .m-score.winner{color:var(--white);}
+  .m-match-meta{border-top:1px solid var(--card-border);padding:8px 14px;display:flex;gap:12px;font-size:11px;color:var(--muted);flex-wrap:wrap;}
+  .m-ch-svt{color:#60b0ff;} .m-ch-tv4{color:#ff9040;}
+
+  @media(max-width:768px){
+    .bracket-outer,.zoom-bar{display:none!important;}
+    .mobile-bracket{display:block;}
+    main{padding:16px;}
+  }
 </style>
 </head>
 <body>
