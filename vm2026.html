@@ -1268,7 +1268,8 @@ function buildBracket() {
     const s = SCH[num] || {};
     const res = knockoutResults[num] || null;
     const card = document.createElement('div');
-    card.className = 'b-card' + (isFinal ? ' final-card' : '');
+    const scaleClasses=['','r-r16','r-qf','r-sf',''];
+    card.className = 'b-card' + (isFinal ? ' final-card' : '') + (scaleClasses[round] ? ' '+scaleClasses[round] : '');
 
     const wd = getWeekday(s.date || '');
     const dateStr = wd && s.date ? `${wd} ${s.date}` : (s.date || '');
@@ -1317,7 +1318,7 @@ function buildBracket() {
     const botCard = leftR32Pos[i*2+1];
     const midY = (topCard.y + botCard.y + CH) / 2 - CH/2;
     const x = CW + COL_GAP;
-    const card = makeCard(leftR16[i]);
+    const card = makeCard(leftR16[i], null, null, false, 1);
     const pos = placeCard(card, x, midY);
     leftR16Pos.push(pos);
 
