@@ -1419,7 +1419,7 @@ function buildBracket() {
   const rbotCard = rightQFPos[1];
   const rsfMidY = (rtopCard.y + rbotCard.y + CH) / 2 - CH/2;
   const rsfX = totalW - 4*CW - 3*COL_GAP;
-  const rightSFCard = makeCard(rightSF[0]);
+  const rightSFCard = makeCard(rightSF[0], null, null, false, 3);
   const rightSFPos = placeCard(rightSFCard, rsfX, rsfMidY);
   rightSFPos.cx = rsfX;
   {
