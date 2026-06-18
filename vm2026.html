@@ -1383,7 +1383,7 @@ function buildBracket() {
     const botCard = rightR32Pos[i*2+1];
     const midY = (topCard.y + botCard.y + CH) / 2 - CH/2;
     const x = totalW - 2*CW - COL_GAP;
-    const card = makeCard(rightR16[i]);
+    const card = makeCard(rightR16[i], null, null, false, 1);
     const pos = placeCard(card, x, midY);
     pos.cx = x;
     rightR16Pos.push(pos);
@@ -1402,7 +1402,7 @@ function buildBracket() {
     const botCard = rightR16Pos[i*2+1];
     const midY = (topCard.y + botCard.y + CH) / 2 - CH/2;
     const x = totalW - 3*CW - 2*COL_GAP;
-    const card = makeCard(rightQF[i]);
+    const card = makeCard(rightQF[i], null, null, false, 2);
     const pos = placeCard(card, x, midY);
     pos.cx = x;
     rightQFPos.push(pos);
