@@ -176,7 +176,7 @@
     <div class="spinner"></div>
     <span id="status-text">Hämtar resultat från football-data.org…</span>
   </div>
-  <div id="error-area"><div class="error-box">⚠️ Kunde inte nå API:et. Kör <code>python3 server.py</code> och öppna <a href="http://localhost:8765/" style="color:var(--gold)">http://localhost:8765</a>.</div></div>
+  <div id="error-area"></div>
 
   <div id="tab-groups" class="tab-panel active">
     <div class="legend">
@@ -896,7 +896,7 @@
 // ═══════════════════════════════════════
 const PROXY = window.location.port === '8765'
   ? 'http://localhost:8765/api'
-  : 'https://api.football-data.org/v4';
+  : '/api';
 const API_TOKEN = '634a7a50cdbd4cba8205ca185ab8c78d';
 // NOTE: Direct browser requests to football-data.org are blocked by CORS.
 // Run server.py and open http://localhost:8765 for live data.
@@ -1555,10 +1555,11 @@ async function fetchData() {
 
   } catch(err){
     const isLocal = window.location.protocol==='file:';
-    const notProxy = window.location.port!=='8765';
     let msg = err.message;
-    if((msg.includes('fetch')||msg.includes('Failed'))&&(isLocal||notProxy)){
+    if(isLocal){
       msg=`Kunde inte nå API:et. Kör <code>python3 server.py</code> och öppna <a href="http://localhost:8765" style="color:var(--gold)">http://localhost:8765</a>.`;
+    } else if(msg.includes('fetch')||msg.includes('Failed')){
+      msg=`Kunde inte nå API:et. Kontrollera att servern är igång.`;
     }
     errorArea.innerHTML=`<div class="error-box">⚠️ ${msg}</div>`;
     renderGroups();
