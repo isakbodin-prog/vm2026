@@ -1485,6 +1485,16 @@ function buildBracket() {
   tLabel.textContent = '3:e plats · 18 jul';
   stage.appendChild(tLabel);
 
+  // ── Mobil bracket ──
+  const mobileRounds = [
+    { key:'r32', name:'Omg. 32', matches:[...leftR32,...rightR32].sort((a,b)=>a.num-b.num).map(m=>({num:m.num,a:m.a(),b:m.b()})) },
+    { key:'r16', name:'Omg. 16', matches:[...leftR16,...rightR16].sort((a,b)=>a-b).map(n=>({num:n,a:null,b:null})) },
+    { key:'qf',  name:'Kvarts',  matches:[...leftQF,...rightQF].sort((a,b)=>a-b).map(n=>({num:n,a:null,b:null})) },
+    { key:'sf',  name:'Semi',    matches:[leftSF[0],rightSF[0]].sort((a,b)=>a-b).map(n=>({num:n,a:null,b:null})) },
+    { key:'f',   name:'Final',   matches:[{num:FINAL,a:null,b:null},{num:THIRD,a:null,b:null}] },
+  ];
+  buildMobileBracket(mobileRounds);
+
   // Fit to screen after building
   requestAnimationFrame(fitBracket);
 }
