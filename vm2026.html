@@ -1264,7 +1264,7 @@ function buildBracket() {
   stage.appendChild(chdr);
 
   // ── Card builder ──
-  function makeCard(num, teamA, teamB, isFinal=false){
+  function makeCard(num, teamA, teamB, isFinal=false, round=0){
     const s = SCH[num] || {};
     const res = knockoutResults[num] || null;
     const card = document.createElement('div');
