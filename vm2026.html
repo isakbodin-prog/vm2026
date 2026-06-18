@@ -1247,13 +1247,13 @@ function buildBracket() {
     hdr.textContent = roundNames[r];
     stage.appendChild(hdr);
   }
-  // RIGHT headers (right to left, mirrored)
+  // RIGHT headers (right to left, mirrored — SF nearest center, R32 at far right)
   for(let r=0;r<4;r++){
     const x = totalW - sideW + r*(CW+COL_GAP);
     const hdr = document.createElement('div');
     hdr.className = 'b-round-hdr';
     hdr.style.cssText = `position:absolute;top:0;left:${x}px;width:${CW}px;`;
-    hdr.textContent = roundNames[r];
+    hdr.textContent = roundNames[3-r];
     stage.appendChild(hdr);
   }
   // Center header
