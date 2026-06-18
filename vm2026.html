@@ -1354,7 +1354,7 @@ function buildBracket() {
   const botCard = leftQFPos[1];
   const sfMidY = (topCard.y + botCard.y + CH) / 2 - CH/2;
   const sfX = 3*(CW+COL_GAP);
-  const leftSFCard = makeCard(leftSF[0]);
+  const leftSFCard = makeCard(leftSF[0], null, null, false, 3);
   const leftSFPos = placeCard(leftSFCard, sfX, sfMidY);
   {
     const rx = sfX;
