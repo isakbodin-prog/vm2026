@@ -1164,10 +1164,26 @@ function fitBracket() {
   const stage = document.getElementById('bracket-stage');
   if (!outer || !stage) return;
   const stageW = parseFloat(stage.style.width) || 1723;
+  const stageH = parseFloat(stage.style.height) || 800;
   const availW = outer.clientWidth - 4;
-  bracketZoom = Math.max(0.25, Math.min(1.0, availW / stageW));
+  const availH = outer.clientHeight - 4;
+  const isLandscapePhone = window.innerHeight < 520 && window.innerWidth > window.innerHeight;
+  if (isLandscapePhone && availH > 50) {
+    // Landscape: anpassa efter höjd (den begränsande dimensionen)
+    bracketZoom = Math.max(0.15, Math.min(1.0, availH / stageH));
+  } else {
+    bracketZoom = Math.max(0.25, Math.min(1.0, availW / stageW));
+  }
   applyZoom();
 }
+
+// Auto-anpassa bracketen vid rotation
+window.addEventListener('resize', function() {
+  const isLandscapePhone = window.innerHeight < 520 && window.innerWidth > window.innerHeight;
+  if (isLandscapePhone) {
+    setTimeout(fitBracket, 150);
+  }
+});
 
 // ═══════════════════════════════════════
 // BRACKET LAYOUT ENGINE
