@@ -1180,38 +1180,37 @@ function buildBracket() {
     return sortBest3Teams(thirds)[i] || null;
   }
 
-  // R32 matchups per side
-  // Left side (top bracket): matches 73,76,79,80,81,82,74,75 — 8 matches
-  // Right side (bottom bracket): matches 77,78,83,84,85,86,87,88
-  // 3:e-plats-motståndet väljs via FIFAs 495-kombinationstabell (getThirdForMatch)
+  // R32 matchups per side — korrekta par per FIFA officiella schema:
+  // Vänster (→ M101): M74+M77→89, M73+M75→90, M83+M84→93, M81+M82→94
+  // Höger  (→ M102): M76+M78→91, M79+M80→92, M86+M88→95, M85+M87→96
   const leftR32 = [
-    {num:73, a:()=>g2('A'),   b:()=>g2('B')},
-    {num:76, a:()=>g1('C'),   b:()=>g2('F')},
-    {num:79, a:()=>g1('A'),   b:()=>getThirdForMatch(79)},
-    {num:80, a:()=>g1('L'),   b:()=>getThirdForMatch(80)},
-    {num:81, a:()=>g1('D'),   b:()=>getThirdForMatch(81)},
-    {num:82, a:()=>g1('G'),   b:()=>getThirdForMatch(82)},
     {num:74, a:()=>g1('E'),   b:()=>getThirdForMatch(74)},
-    {num:75, a:()=>g1('F'),   b:()=>g2('C')},
-  ];
-  const rightR32 = [
     {num:77, a:()=>g1('I'),   b:()=>getThirdForMatch(77)},
-    {num:78, a:()=>g2('E'),   b:()=>g2('I')},
+    {num:73, a:()=>g2('A'),   b:()=>g2('B')},
+    {num:75, a:()=>g1('F'),   b:()=>g2('C')},
     {num:83, a:()=>g2('K'),   b:()=>g2('L')},
     {num:84, a:()=>g1('H'),   b:()=>g2('J')},
-    {num:85, a:()=>g1('B'),   b:()=>getThirdForMatch(85)},
+    {num:81, a:()=>g1('D'),   b:()=>getThirdForMatch(81)},
+    {num:82, a:()=>g1('G'),   b:()=>getThirdForMatch(82)},
+  ];
+  const rightR32 = [
+    {num:76, a:()=>g1('C'),   b:()=>g2('F')},
+    {num:78, a:()=>g2('E'),   b:()=>g2('I')},
+    {num:79, a:()=>g1('A'),   b:()=>getThirdForMatch(79)},
+    {num:80, a:()=>g1('L'),   b:()=>getThirdForMatch(80)},
     {num:86, a:()=>g1('J'),   b:()=>g2('H')},
-    {num:87, a:()=>g1('K'),   b:()=>getThirdForMatch(87)},
     {num:88, a:()=>g2('D'),   b:()=>g2('G')},
+    {num:85, a:()=>g1('B'),   b:()=>getThirdForMatch(85)},
+    {num:87, a:()=>g1('K'),   b:()=>getThirdForMatch(87)},
   ];
 
   // Rounds per side: R32(8), R16(4), QF(2), SF(1)
-  // Right side R16: 93,94,95,96  QF:99,100  SF:102
-  // Left side R16:  89,90,91,92  QF:97,98   SF:101
-  const leftR16  = [89,90,91,92];
+  // Left:  R16 89,90,93,94  QF:97,98   SF:101
+  // Right: R16 91,92,95,96  QF:99,100  SF:102
+  const leftR16  = [89,90,93,94];
   const leftQF   = [97,98];
   const leftSF   = [101];
-  const rightR16 = [93,94,95,96];
+  const rightR16 = [91,92,95,96];
   const rightQF  = [99,100];
   const rightSF  = [102];
 
