@@ -1546,6 +1546,12 @@ function buildMobileBracket(rounds) {
   if (!container) return;
   container.innerHTML = '';
 
+  // Rotationstips (visas bara i porträtt via CSS)
+  const tip = document.createElement('div');
+  tip.className = 'm-rotate-tip';
+  tip.innerHTML = '<span>📲</span><span>Vänd mobilen för att se hela slutspelsträdet</span>';
+  container.appendChild(tip);
+
   // Rundflikar
   const tabBar = document.createElement('div');
   tabBar.className = 'm-round-tabs';
