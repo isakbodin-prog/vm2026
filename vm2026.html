@@ -1498,8 +1498,8 @@ function buildBracket() {
     101:104,102:104
   };
   const mobileRounds = [
-    { key:'r32', name:'Omg. 32', matches:[...leftR32,...rightR32].map(m=>({num:m.num,a:m.a(),b:m.b(),next:PAIR_MAP[m.num]})).sort((a,b)=>(a.next||999)-(b.next||999)||a.num-b.num) },
-    { key:'r16', name:'Omg. 16', matches:[...leftR16,...rightR16].map(n=>({num:n,a:null,b:null,next:PAIR_MAP[n]})).sort((a,b)=>(a.next||999)-(b.next||999)||a.num-b.num) },
+    { key:'r32', name:'Sextondelsfinal', matches:[...leftR32,...rightR32].map(m=>({num:m.num,a:m.a(),b:m.b(),next:PAIR_MAP[m.num]})).sort((a,b)=>(a.next||999)-(b.next||999)||a.num-b.num) },
+    { key:'r16', name:'Åttondelsfinal', matches:[...leftR16,...rightR16].map(n=>({num:n,a:null,b:null,next:PAIR_MAP[n]})).sort((a,b)=>(a.next||999)-(b.next||999)||a.num-b.num) },
     { key:'qf',  name:'Kvarts',  matches:[...leftQF,...rightQF].map(n=>({num:n,a:null,b:null,next:PAIR_MAP[n]})).sort((a,b)=>(a.next||999)-(b.next||999)||a.num-b.num) },
     { key:'sf',  name:'Semi',    matches:[leftSF[0],rightSF[0]].map(n=>({num:n,a:null,b:null,next:PAIR_MAP[n]})).sort((a,b)=>a.num-b.num) },
     { key:'f',   name:'Final',   matches:[{num:FINAL,a:null,b:null},{num:THIRD,a:null,b:null}] },
