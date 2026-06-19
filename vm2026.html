@@ -1826,5 +1826,40 @@ if (window.innerHeight < 520 && window.innerWidth > window.innerHeight) {
 </script>
 
 
+<div id="ig-banner">
+  <div class="ig-banner-title">📱 Öppna i din webbläsare</div>
+  <div class="ig-banner-text">
+    Du verkar använda Instagrams inbyggda webbläsare. För bästa upplevelse — tryck på
+    <strong>⋯ (tre punkter)</strong> uppe i hörnet och välj <strong>"Öppna i webbläsare"</strong>.
+  </div>
+  <div class="ig-banner-btns">
+    <button class="ig-open-btn" onclick="tryOpenExternal()">Öppna i Safari/Chrome</button>
+    <button class="ig-dismiss-btn" onclick="document.getElementById('ig-banner').classList.remove('show')">Fortsätt ändå</button>
+  </div>
+</div>
+
+<script>
+// Detektera Instagrams inbyggda webbläsare
+(function() {
+  const ua = navigator.userAgent || '';
+  if (ua.includes('Instagram')) {
+    document.getElementById('ig-banner').classList.add('show');
+  }
+})();
+
+function tryOpenExternal() {
+  const url = window.location.href;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  // Försök öppna i Safari (iOS) eller Chrome (Android)
+  if (isIOS) {
+    window.location.href = 'x-safari-' + url;
+    // Fallback: instruera användaren
+    setTimeout(() => alert('Tryck på ⋯ → "Öppna i Safari" om sidan inte öppnades automatiskt.'), 1000);
+  } else {
+    window.location.href = 'intent://' + url.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+  }
+}
+</script>
+
 <script data-goatcounter="https://vm2026.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>
