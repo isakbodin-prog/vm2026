@@ -180,7 +180,8 @@
   .m-pair-connector{font-size:11px;color:var(--gold);font-weight:600;padding:5px 14px 8px;letter-spacing:.3px;}
   .m-pair-connector::before{content:'→ ';}
 
-  @media(max-width:768px){
+  @media(max-width:768px),
+         (orientation:landscape) and (max-height:500px){
     .bracket-outer,.zoom-bar{display:none!important;}
     .mobile-bracket{display:block;}
     main{padding:16px;}
