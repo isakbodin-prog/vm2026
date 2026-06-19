@@ -178,11 +178,22 @@
   .m-pair-connector{font-size:11px;color:var(--gold);font-weight:600;padding:5px 14px 8px;letter-spacing:.3px;}
   .m-pair-connector::before{content:'→ ';}
 
-  @media(max-width:768px),
-         (orientation:landscape) and (max-height:500px){
+  /* Porträtt-mobil: tab-vy */
+  @media(max-width:768px){
     .bracket-outer,.zoom-bar{display:none!important;}
     .mobile-bracket{display:block;}
     main{padding:16px;}
+  }
+  /* Landscape-mobil: visa desktop-bracketen auto-anpassad */
+  @media(orientation:landscape) and (max-height:500px){
+    .mobile-bracket{display:none!important;}
+    .bracket-outer{display:block!important;}
+    .zoom-bar{display:flex!important;}
+    main{padding:8px 12px;}
+    header{padding:10px 16px;}
+    .logo-title{font-size:22px;}
+    .tabs{padding:0 12px;}
+    .tab-btn{padding:8px 14px;font-size:12px;}
   }
 </style>
 </head>
