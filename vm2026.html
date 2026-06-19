@@ -1809,6 +1809,10 @@ renderGroups();
 buildBracket();
 fetchData();
 scheduleAutoRefresh();
+// Om sidan laddas i landscape direkt — anpassa bracketen
+if (window.innerHeight < 520 && window.innerWidth > window.innerHeight) {
+  setTimeout(fitBracket, 300);
+}
 </script>
 
 
