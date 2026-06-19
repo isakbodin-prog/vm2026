@@ -1520,6 +1520,12 @@ function buildMobileBracket(rounds) {
   if (!container) return;
   container.innerHTML = '';
 
+  // Rotationstips
+  const tip = document.createElement('div');
+  tip.className = 'm-rotate-tip';
+  tip.innerHTML = '<span>📲</span><span>Tips: vänd mobilen för att se hela slutspelsträdet</span>';
+  container.appendChild(tip);
+
   // Rundflikar
   const tabBar = document.createElement('div');
   tabBar.className = 'm-round-tabs';
