@@ -31,15 +31,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        # Serve the HTML file at root
-        if self.path in ('/', '/vm2026.html'):
-            self._serve_html()
+        path = self.path.split('?')[0]  # strip query params
         # Proxy /api/* → football-data.org
-        elif self.path.startswith('/api/'):
-            self._proxy(self.path[4:])   # strip /api
+        if path.startswith('/api/'):
+            self._proxy(path[4:])
         else:
-            self.send_response(404)
-            self.end_headers()
+            # Serve HTML for all other paths (hanterar Instagrams URL-varianter)
+            self._serve_html()
 
     def _serve_html(self):
         try:
